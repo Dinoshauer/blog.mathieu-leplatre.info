@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>Render your TileMill stylesheets with Landez</title>
+        <meta charset="utf-8" />
+        <link rel="stylesheet" href="http://blog.mathieu-leplatre.info/theme/css/main.css" type="text/css" />
+        <link href="http://blog.mathieu-leplatre.info/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Mathieu Leplatre Atom Feed" />
+
+        <!--[if IE]>
+                <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+        <!--[if lte IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="http://blog.mathieu-leplatre.info/css/ie.css"/>
+                <script src="http://blog.mathieu-leplatre.info/js/IE8.js" type="text/javascript"></script><![endif]-->
+
+        <!--[if lt IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="http://blog.mathieu-leplatre.info/css/ie6.css"/><![endif]-->
+
+</head>
+
+<body id="index" class="home">
+<a href="https://github.com/leplatrem">
+<img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork me on GitHub" />
+</a>
+        <header id="banner" class="body">
+                <h1><a href="http://blog.mathieu-leplatre.info/">Mathieu Leplatre </a></h1>
+                <nav><ul>
+                    <li><a href="http://blog.mathieu-leplatre.info/pages/about.html">About</a></li>
+                    <li class="active"><a href="http://blog.mathieu-leplatre.info/category/dev.html">Dev</a></li>
+                    <li ><a href="http://blog.mathieu-leplatre.info/category/personal.html">Personal</a></li>
+                    <li ><a href="http://blog.mathieu-leplatre.info/category/sys.html">Sys</a></li>
+                    <li ><a href="http://blog.mathieu-leplatre.info/category/ux.html">Ux</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="http://blog.mathieu-leplatre.info/render-your-tilemill-stylesheets-with-landez.html" rel="bookmark"
+           title="Permalink to Render your TileMill stylesheets with Landez">Render your TileMill stylesheets with Landez</a></h1>
+<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="leplatrem">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-03-22T00:00:00+01:00">
+                Thu 22 March 2012
+        </abbr>
+
+        <address class="vcard author">
+                By <a class="url fn" href="http://blog.mathieu-leplatre.info/author/mathieu-leplatre.html">Mathieu Leplatre</a>
+        </address>
+<p>In <a href="http://blog.mathieu-leplatre.info/category/dev.html">Dev</a>. </p>
+<p>tags: <a href="http://blog.mathieu-leplatre.info/tag/tilemill.html">tilemill</a><a href="http://blog.mathieu-leplatre.info/tag/landez.html">landez</a><a href="http://blog.mathieu-leplatre.info/tag/gis.html">gis</a><a href="http://blog.mathieu-leplatre.info/tag/howto.html">howto</a></p>
+</footer><!-- /.post-info -->      <p><a class="reference external" href="http://mapbox.com/tilemill/">TileMill</a> is an amazing tool to design your map, and publish it.
+With <a class="reference external" href="http://pypi.python.org/pypi/landez">landez</a>, you can easily render it using python,
+or do <a class="reference external" href="/landez-introducing-new-features-of-our-tiles-toolbox.html">whatever comes with the API</a> !</p>
+<div class="section" id="from-tilemill-to-landez">
+<h2>From TileMill to Landez</h2>
+<p>Use Tilemill to design your map, and export the <a class="reference external" href="http://mapnik.org">Mapnik</a> XML stylesheet :</p>
+<img alt="" src="/images/tilemill-export-stylesheet.png" />
+<p>Then simply use <em>landez</em> with <tt class="docutils literal">stylefile</tt> argument :</p>
+<div class="highlight"><pre><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">landez</span> <span class="kn">import</span> <span class="n">MBTilesBuilder</span>
+
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+
+<span class="n">mb</span> <span class="o">=</span> <span class="n">MBTilesBuilder</span><span class="p">(</span><span class="n">stylefile</span><span class="o">=</span><span class="s">&quot;Toulouse-Voirie.xml&quot;</span><span class="p">,</span>
+                    <span class="n">filepath</span><span class="o">=</span><span class="s">&quot;toulouse-voirie.mbtiles&quot;</span><span class="p">)</span>
+<span class="n">mb</span><span class="o">.</span><span class="n">add_coverage</span><span class="p">(</span><span class="n">bbox</span><span class="o">=</span><span class="p">[</span><span class="mf">1.39</span><span class="p">,</span> <span class="mf">43.56</span><span class="p">,</span> <span class="mf">1.50</span><span class="p">,</span> <span class="mf">43.64</span><span class="p">],</span>
+                <span class="n">zoomlevels</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">18</span><span class="p">))</span>
+<span class="n">mb</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+<p>In the above example, a <em>MBTiles</em> file <tt class="docutils literal"><span class="pre">toulouse-voirie.mbtiles</span></tt> will be
+created with all rendered tiles. (<strong>Note:</strong> This won't render UTF-Grid tiles,
+since TileMill does not expose this part in the XML stylesheet.)</p>
+<p>If you don't have Mapnik2 installed, you might encounter rendering errors
+like : <tt class="docutils literal">AssertionError: Cannot render tiles without mapnik !</tt>.</p>
+</div>
+<div class="section" id="installation-of-mapnik-2">
+<h2>Installation of Mapnik 2</h2>
+<div class="section" id="mapnik2-packages-on-debian-ubuntu">
+<h3>Mapnik2 packages on Debian/Ubuntu</h3>
+<p>In Ubuntu Precise (12.04) or Debian Wheezy (7.0), it's a piece of cake,
+the package is available in the repos</p>
+<pre class="literal-block">
+sudo apt-get install python-mapnik2
+</pre>
+<p>In Ubuntu Maverick (10.10), Natty (11.04), Oneiric (11.10), it's quite easy,
+there is a PPA, from MapBox</p>
+<pre class="literal-block">
+sudo apt-add-repository ppa:developmentseed/mapbox
+sudo update
+sudo apt-get install python-mapnik2
+</pre>
+</div>
+<div class="section" id="mapnik2-and-python-bindings-from-sources">
+<h3>Mapnik2 and python bindings from sources</h3>
+<p>Welcome in the quicksands of installing Mapnik2 python bindings from sources !</p>
+<p><a class="reference external" href="https://github.com/cspanring">Christian Spanring</a> wrote a quick tutorial
+to <a class="reference external" href="https://gist.github.com/1314907">install it from sources on Ubuntu 10.04</a>.</p>
+<p>It might be a bit tricky to tweak this tutorial for your distribution. Hopefully, our
+colleague <a class="reference external" href="https://github.com/kiorky">Mathieu</a> has prepared a <a class="reference external" href="http://minitage.org">minitage's</a> &quot;<em>minilay</em>&quot; for it, <a class="reference external" href="http://pypi.python.org/pypi/mapnik2#minitage">just follow the few steps</a>
+to compile the whole stack.</p>
+</div>
+</div>
+
+    </div><!-- /.entry-content -->
+    <div class="comments">
+      <h2>Comments !</h2>
+      <div id="disqus_thread"></div>
+      <script type="text/javascript">
+        var disqus_identifier = "render-your-tilemill-stylesheets-with-landez.html";
+        (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://mathieuleplatre.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+      </script>
+    </div>
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+                            <li><a href="http://blog.mathieu-leplatre.info/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="http://www.linkedin.com/in/leplatre">LinkedIn</a></li>
+                            <li><a href="https://code.launchpad.net/~mathieu.leplatre">Launchpad</a></li>
+                            <li><a href="https://github.com/leplatrem">GitHub</a></li>
+                            <li><a href="https://plus.google.com/u/0/106965745149150173373">Google+</a></li>
+                            <li><a href="http://twitter.com/leplatrem">Twitter</a></li>
+                            <li><a href="http://identi.ca/leplatrem">Identi.ca</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+        var pkBaseURL = (("https:" == document.location.protocol) ? "https://mathieu-leplatre.info/piwik/" : "http://mathieu-leplatre.info/piwik/");
+    document.write(unescape("%3Cscript src='" + pkBaseURL + "piwik.js' type='text/javascript'%3E%3C/script%3E"));
+    </script><script type="text/javascript">
+    try {
+    var piwikTracker = Piwik.getTracker(pkBaseURL + "piwik.php", 1);
+    piwikTracker.trackPageView();
+    piwikTracker.enableLinkTracking();
+    } catch( err ) {}
+    </script><noscript><p><img src="http://mathieu-leplatre.info/piwik/piwik.php?idsite=1" style="border:0" alt="" /></p></noscript>
+<script type="text/javascript">
+    var disqus_shortname = 'mathieuleplatre';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
+</body>
+</html>

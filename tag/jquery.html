@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>Mathieu Leplatre - jquery</title>
+        <meta charset="utf-8" />
+        <link rel="stylesheet" href="http://blog.mathieu-leplatre.info/theme/css/main.css" type="text/css" />
+        <link href="http://blog.mathieu-leplatre.info/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Mathieu Leplatre Atom Feed" />
+
+        <!--[if IE]>
+                <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+        <!--[if lte IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="http://blog.mathieu-leplatre.info/css/ie.css"/>
+                <script src="http://blog.mathieu-leplatre.info/js/IE8.js" type="text/javascript"></script><![endif]-->
+
+        <!--[if lt IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="http://blog.mathieu-leplatre.info/css/ie6.css"/><![endif]-->
+
+</head>
+
+<body id="index" class="home">
+<a href="https://github.com/leplatrem">
+<img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork me on GitHub" />
+</a>
+        <header id="banner" class="body">
+                <h1><a href="http://blog.mathieu-leplatre.info/">Mathieu Leplatre </a></h1>
+                <nav><ul>
+                    <li><a href="http://blog.mathieu-leplatre.info/pages/about.html">About</a></li>
+                    <li ><a href="http://blog.mathieu-leplatre.info/category/dev.html">Dev</a></li>
+                    <li ><a href="http://blog.mathieu-leplatre.info/category/personal.html">Personal</a></li>
+                    <li ><a href="http://blog.mathieu-leplatre.info/category/sys.html">Sys</a></li>
+                    <li ><a href="http://blog.mathieu-leplatre.info/category/ux.html">Ux</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+        
+        
+
+            <aside id="featured" class="body">
+                <article>
+                    <h1 class="entry-title"><a href="http://blog.mathieu-leplatre.info/carte-des-velos-avec-leaflet-fr.html">Carte des vélos avec Leaflet</a></h1> 
+<footer class="post-info">
+        <abbr class="published" title="2011-05-30T15:25:00+02:00">
+                Mon 30 May 2011
+        </abbr>
+
+        <address class="vcard author">
+                By <a class="url fn" href="http://blog.mathieu-leplatre.info/author/mathieu-leplatre.html">Mathieu Leplatre</a>
+        </address>
+<p>In <a href="http://blog.mathieu-leplatre.info/category/dev.html">Dev</a>. </p>
+<p>tags: <a href="http://blog.mathieu-leplatre.info/tag/javascript.html">javascript</a><a href="http://blog.mathieu-leplatre.info/tag/leaflet.html">leaflet</a><a href="http://blog.mathieu-leplatre.info/tag/mustache.html">mustache</a><a href="http://blog.mathieu-leplatre.info/tag/pyquery.html">pyquery</a><a href="http://blog.mathieu-leplatre.info/tag/jquery.html">jquery</a></p>
+</footer><!-- /.post-info --><p><em>Article original publié chez</em> <a class="reference external" href="http://makina-corpus.org">Makina Corpus</a></p>
+<p>Les bookmarks, un peu comme les cahiers de recettes, c'est bien de les remplir mais encore faut-il trouver les bons au moment adéquate !
+Même quand il s'agit d'outils, de bibliothèques et de services Web, il faut trouver l'occasion de les tester avant le grand soir !
+Et si on veut en faire un article de blog, alors là, il faut en plus donner envie d'y goûter :)</p>
+<p>Ici, je prends plein d'ingrédients trouvés au bord des chemins :</p>
+<ul class="simple">
+<li><a class="reference external" href="http://packages.python.org/pyquery/">pyquery</a></li>
+<li><a class="reference external" href="http://leaflet.cloudmade.com">leaflet</a></li>
+<li><a class="reference external" href="http://developer.yahoo.com/yql/">Yahoo Query Language</a></li>
+<li><a class="reference external" href="http://mustache.github.com/">mustache</a></li>
+</ul>
+<p>Je secoue bien fort ! (sans oublier de saupoudrer de <a class="reference external" href="http://jquery.com">jquery</a>) et j'obtiens une carte interactive des stations vélos de Toulouse !</p>
+<div class="section" id="la-liste-des-stations">
+<h2>La liste des stations</h2>
+<p>Sur le site <a class="reference external" href="http://velonow.info">http://velonow.info</a>, je récupère un fichier XML qui contient
+la liste statique des stations de vélo et leurs identifiants.</p>
+<p>C'est l'occasion d'utiliser <a class="reference external" href="http://packages.python.org/pyquery/">pyquery</a> pour le transformer en GeoJSON. <a class="reference external" href="http://www.gawel.org">Gawel</a> nous l'avait présenté aux djangocongs, il s'agit du portage de l'API de JQuery en python !</p>
+<div class="highlight"><pre><span class="kn">from</span> <span class="nn">pyquery</span> <span class="kn">import</span> <span class="n">PyQuery</span> <span class="k">as</span> <span class="n">pq</span>
+
+<span class="n">d</span> <span class="o">=</span> <span class="n">pq</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s">&#39;http://server.com/file.xml&#39;</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">e</span><span class="p">:</span> <span class="n">pq</span><span class="p">(</span><span class="n">e</span><span class="p">),</span> <span class="n">d</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s">&#39;marker&#39;</span><span class="p">)):</span>
+    <span class="n">pt</span> <span class="o">=</span> <span class="n">geojson</span><span class="o">.</span><span class="n">Point</span><span class="p">([</span><span class="n">m</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s">&#39;lng&#39;</span><span class="p">),</span>
+                        <span class="n">m</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s">&#39;lat&#39;</span><span class="p">)])</span>
+    <span class="o">...</span>
+    <span class="o">...</span>
+</pre></div>
+<p>Je trouve ça génial d'avoir la même syntaxe de manipulation du DOM en python et en javascript ! Et pour faire du webscrapping, c'est top !</p>
+</div>
+<div class="section" id="affichage-de-la-carte">
+<h2>Affichage de la carte</h2>
+<p><a class="reference external" href="http://cloudmade.com">Cloudmade</a> a créé <a class="reference external" href="http://leaflet.cloudmade.com">leaflet</a> qui rejoint <a class="reference external" href="http://www.tile5.org">Tile5</a> et <a class="reference external" href="http://polymaps.org">Polymaps</a> en tant que challenger d'Openlayers !</p>
+<p>C'est une bibliothèque légère, jolie, fluide, optimisée pour les mobiles,
+et même compatible Internet Explorer !</p>
+<p>Pour afficher une carte centrée sur la localisation du visiteur de la page, il suffit de faire ça :</p>
+<div class="highlight"><pre><span class="kd">var</span> <span class="nx">map</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">L</span><span class="p">.</span><span class="nx">Map</span><span class="p">(</span><span class="s1">&#39;map&#39;</span><span class="p">);</span>
+
+<span class="kd">var</span> <span class="nx">cloudmadeUrl</span> <span class="o">=</span> <span class="s1">&#39;http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png&#39;</span><span class="p">,</span>
+    <span class="nx">cloudmade</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">L</span><span class="p">.</span><span class="nx">TileLayer</span><span class="p">(</span><span class="nx">cloudmadeUrl</span><span class="p">);</span>
+
+<span class="nx">map</span><span class="p">.</span><span class="nx">addLayer</span><span class="p">(</span><span class="nx">cloudmade</span><span class="p">);</span>
+
+<span class="nx">map</span><span class="p">.</span><span class="nx">locateAndSetView</span><span class="p">();</span>
+</pre></div>
+<p>Pour l'instant, Leaflet ne gère pas les couches au format GeoJSON, en
+attendant <a class="reference external" href="https://github.com/CloudMade/Leaflet/issues/13">la prochaine release</a>,
+nous allons ajouter les points des stations en 2 coups de cuillère à pot :</p>
+<div class="highlight"><pre><span class="nx">$</span><span class="p">.</span><span class="nx">getJSON</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">$</span><span class="p">.</span><span class="nx">each</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">features</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">i</span><span class="p">,</span> <span class="nx">f</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">cc</span> <span class="o">=</span> <span class="nx">f</span><span class="p">.</span><span class="nx">geometry</span><span class="p">.</span><span class="nx">coordinates</span><span class="p">;</span>
+        <span class="kd">var</span> <span class="nx">marker</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">L</span><span class="p">.</span><span class="nx">Marker</span><span class="p">(</span><span class="k">new</span> <span class="nx">L</span><span class="p">.</span><span class="nx">LatLng</span><span class="p">(</span><span class="nx">cc</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nx">cc</span><span class="p">[</span><span class="mi">0</span><span class="p">]));</span>
+        <span class="nx">map</span><span class="p">.</span><span class="nx">addLayer</span><span class="p">(</span><span class="nx">marker</span><span class="p">);</span>
+    <span class="p">});</span>
+<span class="p">});</span>
+</pre></div>
+</div>
+<div class="section" id="details-d-une-station-en-popup">
+<h2>Détails d'une station en popup</h2>
+<p>Les détails d'une station (nombre de vélos, emplacements, libres, occupés) sont disponibles en fournissant un identifiant sur le site de <a class="reference external" href="http://www.velo.toulouse.fr">velo toulouse</a>.
+Mais lorsqu'on appelle la page en Ajax, le corps de la réponse XML est vide. Une protection contre la bidouillabilité sûrement.</p>
+<p>C'est là que <a class="reference external" href="http://developer.yahoo.com/yql/">Yahoo Query Language</a> nous aide ! On passe par Yahoo pour accèder aux ressources du Web avec <a class="reference external" href="http://developer.yahoo.com/yql/console/">des requêtes similaires aux bases de données</a> !</p>
+<div class="highlight"><pre><span class="kd">var</span> <span class="nx">yql</span> <span class="o">=</span> <span class="s2">&quot;select * from xml where url = &#39;&quot;</span> <span class="o">+</span> <span class="nx">url</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span><span class="p">,</span>
+ <span class="nx">yqlurl</span> <span class="o">=</span> <span class="s1">&#39;http://query.yahooapis.com/v1/public/yql?q=&#39;</span> <span class="o">+</span> <span class="nb">encodeURIComponent</span><span class="p">(</span><span class="nx">yql</span><span class="p">);</span>
+<span class="nx">$</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">yqlurl</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// show data in pop up !</span>
+<span class="p">});</span>
+</pre></div>
+<p>Je fais une petite fonction pour transformer l'XML récupéré en objet :</p>
+<div class="highlight"><pre><span class="kd">function</span> <span class="nx">xml2obj</span><span class="p">(</span><span class="nx">xmldata</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">d</span> <span class="o">=</span> <span class="p">{};</span>
+    <span class="nx">$</span><span class="p">(</span><span class="nx">xmldata</span><span class="p">).</span><span class="nx">children</span><span class="p">().</span><span class="nx">each</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">index</span><span class="p">,</span> <span class="nx">value</span><span class="p">){</span>
+        <span class="nx">d</span><span class="p">[</span><span class="nx">$</span><span class="p">(</span><span class="nx">value</span><span class="p">).</span><span class="nx">get</span><span class="p">(</span><span class="mi">0</span><span class="p">).</span><span class="nx">nodeName</span><span class="p">]</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="nx">value</span><span class="p">).</span><span class="nx">text</span><span class="p">();</span>
+    <span class="p">});</span>
+    <span class="k">return</span> <span class="nx">d</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+<div class="highlight"><pre><span class="nt">&lt;station&gt;</span>
+    <span class="nt">&lt;free&gt;</span>12<span class="nt">&lt;/free&gt;</span>
+    <span class="nt">&lt;available&gt;</span>4<span class="nt">&lt;/available&gt;</span>
+    <span class="nt">&lt;total&gt;</span>16<span class="nt">&lt;/total&gt;</span>
+<span class="nt">&lt;/station&gt;</span>
+</pre></div>
+<p>devient :</p>
+<div class="highlight"><pre><span class="p">{</span>
+    <span class="nx">free</span> <span class="o">:</span> <span class="mi">12</span><span class="p">,</span>
+    <span class="nx">available</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span>
+    <span class="nx">total</span><span class="o">:</span> <span class="mi">16</span>
+<span class="p">}</span>
+</pre></div>
+<p>Pour mettre en forme ces informations dans la pop-up, nous allons utiliser <a class="reference external" href="http://mustache.github.com/">mustache</a> !
+Conceptuellement, il s'agit tout simplement d'un moteur de template avec <a class="reference external" href="http://mustache.github.com/mustache.5.html">une syntaxe simplifiée</a> ! Il y a une implémentation
+dans quasiment tous les languages, dont Javascript.</p>
+<p>Cela évite principalement de faire du code javascript pour la mise en forme des données, notamment pour
+celles récupérées en JSON via Ajax.</p>
+<p>On construit une chaîne avec les fameuses <cite>{{}}</cite> et on fournit un objet pour substituer les valeurs :</p>
+<div class="highlight"><pre><span class="kd">var</span> <span class="nx">data</span> <span class="o">=</span> <span class="nx">xml2obj</span><span class="p">(</span><span class="nx">$</span><span class="p">(</span><span class="nx">xmldata</span><span class="p">).</span><span class="nx">find</span><span class="p">(</span><span class="s1">&#39;station&#39;</span><span class="p">)),</span>
+    <span class="nx">template</span> <span class="o">=</span> <span class="s2">&quot;&lt;h2&gt;Station #{{ number }}&lt;/h2&gt;</span>
+<span class="s2">                &lt;p&gt;{{ address }}&lt;/p&gt;                    \</span>
+<span class="s2">                {{# station }}                          \</span>
+<span class="s2">                &lt;ul&gt;                                    \</span>
+<span class="s2">                  &lt;li&gt;{{ available }} available&lt;/li&gt;    \</span>
+<span class="s2">                  &lt;li&gt;{{ free }} free slots&lt;/li&gt;        \</span>
+<span class="s2">                &lt;/ul&gt;                                   \</span>
+<span class="s2">                {{/ station }}&quot;</span><span class="p">,</span>
+    <span class="nx">content</span> <span class="o">=</span> <span class="nx">Mustache</span><span class="p">.</span><span class="nx">to_html</span><span class="p">(</span><span class="nx">template</span><span class="p">,</span> <span class="nx">data</span><span class="p">);</span>
+
+<span class="c1">// Show marker popup !</span>
+<span class="nx">marker</span><span class="p">.</span><span class="nx">bindPopup</span><span class="p">(</span><span class="nx">content</span><span class="p">).</span><span class="nx">openPopup</span><span class="p">();</span>
+</pre></div>
+<p>Et voilà !</p>
+<img alt="" src="/images/leaflet-velo.png" />
+</div>
+<p>There are <a href="http://blog.mathieu-leplatre.info/carte-des-velos-avec-leaflet-fr.html#disqus_thread">comments</a>.</p>                </article>
+<p class="paginator">
+    Page 1 / 1
+</p>
+            </aside><!-- /#featured -->
+            </ol><!-- /#posts-list -->
+            </section><!-- /#content -->
+        <section id="extras" class="body">
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+                            <li><a href="http://blog.mathieu-leplatre.info/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="http://www.linkedin.com/in/leplatre">LinkedIn</a></li>
+                            <li><a href="https://code.launchpad.net/~mathieu.leplatre">Launchpad</a></li>
+                            <li><a href="https://github.com/leplatrem">GitHub</a></li>
+                            <li><a href="https://plus.google.com/u/0/106965745149150173373">Google+</a></li>
+                            <li><a href="http://twitter.com/leplatrem">Twitter</a></li>
+                            <li><a href="http://identi.ca/leplatrem">Identi.ca</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+        var pkBaseURL = (("https:" == document.location.protocol) ? "https://mathieu-leplatre.info/piwik/" : "http://mathieu-leplatre.info/piwik/");
+    document.write(unescape("%3Cscript src='" + pkBaseURL + "piwik.js' type='text/javascript'%3E%3C/script%3E"));
+    </script><script type="text/javascript">
+    try {
+    var piwikTracker = Piwik.getTracker(pkBaseURL + "piwik.php", 1);
+    piwikTracker.trackPageView();
+    piwikTracker.enableLinkTracking();
+    } catch( err ) {}
+    </script><noscript><p><img src="http://mathieu-leplatre.info/piwik/piwik.php?idsite=1" style="border:0" alt="" /></p></noscript>
+<script type="text/javascript">
+    var disqus_shortname = 'mathieuleplatre';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
+</body>
+</html>

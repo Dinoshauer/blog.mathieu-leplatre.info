@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>Another success story about Ruby On Rails working with Apache</title>
+        <meta charset="utf-8" />
+        <link rel="stylesheet" href="http://blog.mathieu-leplatre.info/theme/css/main.css" type="text/css" />
+        <link href="http://blog.mathieu-leplatre.info/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Mathieu Leplatre Atom Feed" />
+
+        <!--[if IE]>
+                <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+        <!--[if lte IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="http://blog.mathieu-leplatre.info/css/ie.css"/>
+                <script src="http://blog.mathieu-leplatre.info/js/IE8.js" type="text/javascript"></script><![endif]-->
+
+        <!--[if lt IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="http://blog.mathieu-leplatre.info/css/ie6.css"/><![endif]-->
+
+</head>
+
+<body id="index" class="home">
+<a href="https://github.com/leplatrem">
+<img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork me on GitHub" />
+</a>
+        <header id="banner" class="body">
+                <h1><a href="http://blog.mathieu-leplatre.info/">Mathieu Leplatre </a></h1>
+                <nav><ul>
+                    <li><a href="http://blog.mathieu-leplatre.info/pages/about.html">About</a></li>
+                    <li ><a href="http://blog.mathieu-leplatre.info/category/dev.html">Dev</a></li>
+                    <li ><a href="http://blog.mathieu-leplatre.info/category/personal.html">Personal</a></li>
+                    <li class="active"><a href="http://blog.mathieu-leplatre.info/category/sys.html">Sys</a></li>
+                    <li ><a href="http://blog.mathieu-leplatre.info/category/ux.html">Ux</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="http://blog.mathieu-leplatre.info/another-success-story-about-ruby-on-rails-working-with-apache.html" rel="bookmark"
+           title="Permalink to Another success story about Ruby On Rails working with Apache">Another success story about Ruby On Rails working with Apache</a></h1>
+<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="leplatrem">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2008-08-01T09:12:00+02:00">
+                Fri 01 August 2008
+        </abbr>
+
+        <address class="vcard author">
+                By <a class="url fn" href="http://blog.mathieu-leplatre.info/author/mathieu-leplatre.html">Mathieu Leplatre</a>
+        </address>
+<p>In <a href="http://blog.mathieu-leplatre.info/category/sys.html">Sys</a>. </p>
+<p>tags: <a href="http://blog.mathieu-leplatre.info/tag/ruby.html">ruby</a><a href="http://blog.mathieu-leplatre.info/tag/howto.html">howto</a></p>
+</footer><!-- /.post-info -->      <p>This procedure does not guarantee anything and should be considered approximate. However this should be fairly enough for someone familiar with Apache environments.</p>
+<div class="section" id="ruby-environment">
+<h2>Ruby environment</h2>
+<p>We install Ruby via apt-get</p>
+<pre class="literal-block">
+sudo apt-get install ruby libzlib-ruby rdoc irb
+</pre>
+<p>At this point, you can run Ruby scripts like you did with Python or Perl.</p>
+</div>
+<div class="section" id="gems">
+<h2>Gems</h2>
+<p>Gems are like perl's CPAN or PHP's PEAR. We install it from source in order to enjoy the whole Gems repository (instead of being limited to packaged gems only).</p>
+<pre class="literal-block">
+wget &quot;http://rubyforge.org/frs/download.php/38646/rubygems-x.x.x.tgz&quot;
+tar -xvzf rubygems-x.x.x.tgz
+rm rubygems-x.x.x.tgz
+cd rubygems-x.x.x
+sudo ruby setup.rb
+cd ..
+rm -r rubygems-1.2.0
+sudo ln -s /usr/bin/gem1.8 /usr/bin/gem
+</pre>
+<p><em>(DO NOT use sudo ruby rubygemsx.x.x/setup.rb)</em></p>
+<pre class="literal-block">
+sudo gem update --system
+</pre>
+<p>We will install additionnal applications... those depend on your needs. The Gems are compiled on the fly, therefore development packages are usually required along.</p>
+</div>
+<div class="section" id="ruby-on-rails">
+<h2>Ruby on Rails</h2>
+<pre class="literal-block">
+sudo gem install rails --include-dependencies
+</pre>
+</div>
+<div class="section" id="mysql-support">
+<h2>Mysql support</h2>
+<pre class="literal-block">
+sudo apt-get install libmysql-ruby libmysqlclient15-dev
+sudo gem install mysql
+</pre>
+</div>
+<div class="section" id="imagemagick-support">
+<h2>ImageMagick support</h2>
+<pre class="literal-block">
+sudo apt-get install librmagick-ruby1.8 libmagick9-dev
+sudo gem install rmagick
+</pre>
+</div>
+<div class="section" id="integrate-with-apache">
+<h2>Integrate with Apache</h2>
+<pre class="literal-block">
+sudo apt-get install apache2-prefork-dev
+</pre>
+<p>Enable additionnal modules</p>
+<pre class="literal-block">
+a2enmod rewrite
+a2enmod suexec
+a2enmod include
+</pre>
+<p><em>I might have missed some.</em>. Some tutorials recommend Fast-CGI.</p>
+</div>
+<div class="section" id="install-phusion-passenger-mod-rails">
+<h2>Install Phusion Passenger (mod_rails)</h2>
+<p>Usually, RubyOnRails has its own web server (<a class="reference external" href="http://en.wikipedia.org/wiki/Mongrel_(web_server)">Mongrel</a>) on port 3000. It is also quite common to have a cluster of processes with load balancing and Apache proxy...</p>
+<p>But you may want to do something very simple that just integrates within Apache. Here comes Phusion Passenger!</p>
+<pre class="literal-block">
+sudo gem install passenger
+sudo passenger-install-apache2-module
+</pre>
+<p><em>(following the instructions, or look at the [[http://www.modrails.com/documentation/Users%20guide.html|user guide]]).</em></p>
+<p>At the end, the wizard tells you to add some lines in <cite>httpd.conf</cite>. I recommend the following method instead, which splits those lines into a module that you can enable / disable.</p>
+<p>Create two files :
+* /etc/apache2/mods-available/mod_rails.load</p>
+<pre class="literal-block">
+LoadModule passenger_module /usr/lib/ruby/gems/1.8/gems/passenger-2.0.2/ext/apache2/mod_passenger.so
+</pre>
+<ul>
+<li><p class="first">/etc/apache2/mods-available/mod_rails.conf</p>
+<pre class="literal-block">
+PassengerRoot /usr/lib/ruby/gems/1.8/gems/passenger-2.0.2
+PassengerRuby /usr/bin/ruby1.8
+</pre>
+</li>
+</ul>
+<p>Enable this new module</p>
+<pre class="literal-block">
+sudo a2enmod mod_rails
+</pre>
+</div>
+<div class="section" id="create-your-virtualhost">
+<h2>Create your VirtualHost</h2>
+<p>The DocumentRoot must point to the public folder of your Ruby On Rails application.</p>
+<ul>
+<li><p class="first">If your Ruby application is alone, your apache site will be something like this</p>
+<pre class="literal-block">
+&lt;virtualhost *:80&gt;
+    ServerName yourapp
+    DocumentRoot /var/rails/yourapp/public/
+    ErrorLog /var/rails/yourapp/log/apache.log
+
+    &lt;directory /var/rails/yourapp/public&gt;
+       Options ExecCGI FollowSymLinks
+       AddHandler cgi-script .cgi
+       AllowOverride all
+       Order allow,deny
+       Allow from all
+    &lt;/directory&gt;
+&lt;/virtualhost&gt;
+</pre>
+</li>
+<li><p class="first">If you want it a subfolder of your current DocumentRoot, look at this.</p>
+</li>
+<li><p class="first">The simplest for me was to setup a sub-domain. Don't forget to update your DNS information.</p>
+</li>
+</ul>
+<p>Relax ! Restart Apache and that's it !</p>
+</div>
+
+    </div><!-- /.entry-content -->
+    <div class="comments">
+      <h2>Comments !</h2>
+      <div id="disqus_thread"></div>
+      <script type="text/javascript">
+        var disqus_identifier = "another-success-story-about-ruby-on-rails-working-with-apache.html";
+        (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://mathieuleplatre.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+      </script>
+    </div>
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+                            <li><a href="http://blog.mathieu-leplatre.info/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="http://www.linkedin.com/in/leplatre">LinkedIn</a></li>
+                            <li><a href="https://code.launchpad.net/~mathieu.leplatre">Launchpad</a></li>
+                            <li><a href="https://github.com/leplatrem">GitHub</a></li>
+                            <li><a href="https://plus.google.com/u/0/106965745149150173373">Google+</a></li>
+                            <li><a href="http://twitter.com/leplatrem">Twitter</a></li>
+                            <li><a href="http://identi.ca/leplatrem">Identi.ca</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+        var pkBaseURL = (("https:" == document.location.protocol) ? "https://mathieu-leplatre.info/piwik/" : "http://mathieu-leplatre.info/piwik/");
+    document.write(unescape("%3Cscript src='" + pkBaseURL + "piwik.js' type='text/javascript'%3E%3C/script%3E"));
+    </script><script type="text/javascript">
+    try {
+    var piwikTracker = Piwik.getTracker(pkBaseURL + "piwik.php", 1);
+    piwikTracker.trackPageView();
+    piwikTracker.enableLinkTracking();
+    } catch( err ) {}
+    </script><noscript><p><img src="http://mathieu-leplatre.info/piwik/piwik.php?idsite=1" style="border:0" alt="" /></p></noscript>
+<script type="text/javascript">
+    var disqus_shortname = 'mathieuleplatre';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
+</body>
+</html>

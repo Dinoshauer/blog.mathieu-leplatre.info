@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>Mathieu Leplatre - easydict</title>
+        <meta charset="utf-8" />
+        <link rel="stylesheet" href="http://blog.mathieu-leplatre.info/theme/css/main.css" type="text/css" />
+        <link href="http://blog.mathieu-leplatre.info/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Mathieu Leplatre Atom Feed" />
+
+        <!--[if IE]>
+                <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+        <!--[if lte IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="http://blog.mathieu-leplatre.info/css/ie.css"/>
+                <script src="http://blog.mathieu-leplatre.info/js/IE8.js" type="text/javascript"></script><![endif]-->
+
+        <!--[if lt IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="http://blog.mathieu-leplatre.info/css/ie6.css"/><![endif]-->
+
+</head>
+
+<body id="index" class="home">
+<a href="https://github.com/leplatrem">
+<img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork me on GitHub" />
+</a>
+        <header id="banner" class="body">
+                <h1><a href="http://blog.mathieu-leplatre.info/">Mathieu Leplatre </a></h1>
+                <nav><ul>
+                    <li><a href="http://blog.mathieu-leplatre.info/pages/about.html">About</a></li>
+                    <li ><a href="http://blog.mathieu-leplatre.info/category/dev.html">Dev</a></li>
+                    <li ><a href="http://blog.mathieu-leplatre.info/category/personal.html">Personal</a></li>
+                    <li ><a href="http://blog.mathieu-leplatre.info/category/sys.html">Sys</a></li>
+                    <li ><a href="http://blog.mathieu-leplatre.info/category/ux.html">Ux</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+        
+        
+
+            <aside id="featured" class="body">
+                <article>
+                    <h1 class="entry-title"><a href="http://blog.mathieu-leplatre.info/django-gestion-des-settings-dapplication-simplifiee-fr.html">Django, gestion des settings d'application simplifiée</a></h1> 
+<footer class="post-info">
+        <abbr class="published" title="2011-07-29T18:30:00+02:00">
+                Fri 29 July 2011
+        </abbr>
+
+        <address class="vcard author">
+                By <a class="url fn" href="http://blog.mathieu-leplatre.info/author/mathieu-leplatre.html">Mathieu Leplatre</a>
+        </address>
+<p>In <a href="http://blog.mathieu-leplatre.info/category/dev.html">Dev</a>. </p>
+<p>tags: <a href="http://blog.mathieu-leplatre.info/tag/django.html">django</a><a href="http://blog.mathieu-leplatre.info/tag/easydict.html">easydict</a></p>
+</footer><!-- /.post-info --><p>Je reprends ici la méthode présentée par <a class="reference external" href="http://blog.akei.com/post/4575980188/une-autre-facon-de-gerer-ses-settings-dapplication">Nicolas</a> et je la couple avec mon petit <a class="reference external" href="https://github.com/makinacorpus/easydict">EasyDict</a> pour alléger l'utilisation !
+Comme ses snippets sont drôles, je ne les change pas !</p>
+<div class="section" id="parametres-par-default-de-l-application">
+<h2>Paramètres par défault de l'application</h2>
+<p>On a juste un constructeur à ajouter par rapport à ce qu'avait présenté NiKo (avec <a class="reference external" href="http://pypi.python.org/pypi/easydict/">EasyDict installé</a>).</p>
+<div class="highlight"><pre><span class="c"># apps/my_app/__init__.py</span>
+<span class="kn">from</span> <span class="nn">django.conf</span> <span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">from</span> <span class="nn">easydict</span> <span class="kn">import</span> <span class="n">EasyDict</span>
+
+<span class="n">app_settings</span> <span class="o">=</span> <span class="n">EasyDict</span><span class="p">(</span><span class="nb">dict</span><span class="p">({</span>
+    <span class="s">&#39;FOO&#39;</span><span class="p">:</span> <span class="mi">42</span><span class="p">,</span>
+    <span class="s">&#39;ENABLE_CHUCK_NORRIZ_MODE&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+<span class="p">},</span> <span class="o">**</span><span class="nb">getattr</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="s">&#39;MY_APP_CONFIG&#39;</span><span class="p">,</span> <span class="p">{})))</span>
+</pre></div>
+</div>
+<div class="section" id="surcharge-dans-le-projet">
+<h2>Surcharge dans le projet</h2>
+<div class="highlight"><pre><span class="c"># settings.py</span>
+<span class="n">MY_APP_CONFIG</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&#39;ENABLE_CHUCK_NORRIZ_MODE&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="section" id="utilisation">
+<h2>Utilisation !</h2>
+<p>EasyDict transforme les clés du <cite>dict</cite> en attributs, on accède aux settings en toute simplicité !</p>
+<div class="highlight"><pre><span class="c"># foo/bar.py</span>
+<span class="kn">from</span> <span class="nn">my_app</span> <span class="kn">import</span> <span class="n">app_settings</span>
+
+<span class="k">print</span> <span class="n">app_settings</span><span class="o">.</span><span class="n">FOO</span> <span class="c"># 42</span>
+</pre></div>
+<div class="highlight"><pre><span class="c"># apps/my_app/utils.py</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">app_settings</span>
+
+<span class="k">if</span> <span class="n">app_settings</span><span class="o">.</span><span class="n">ENABLE_CHUCK_NORRIZ_MODE</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s">&#39;Chuck Norriz is watching you&#39;</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s">&#39;Dance dance, little lamb&#39;</span>
+</pre></div>
+</div>
+<p>There are <a href="http://blog.mathieu-leplatre.info/django-gestion-des-settings-dapplication-simplifiee-fr.html#disqus_thread">comments</a>.</p>                </article>
+<p class="paginator">
+    Page 1 / 1
+</p>
+            </aside><!-- /#featured -->
+            </ol><!-- /#posts-list -->
+            </section><!-- /#content -->
+        <section id="extras" class="body">
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+                            <li><a href="http://blog.mathieu-leplatre.info/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="http://www.linkedin.com/in/leplatre">LinkedIn</a></li>
+                            <li><a href="https://code.launchpad.net/~mathieu.leplatre">Launchpad</a></li>
+                            <li><a href="https://github.com/leplatrem">GitHub</a></li>
+                            <li><a href="https://plus.google.com/u/0/106965745149150173373">Google+</a></li>
+                            <li><a href="http://twitter.com/leplatrem">Twitter</a></li>
+                            <li><a href="http://identi.ca/leplatrem">Identi.ca</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+        var pkBaseURL = (("https:" == document.location.protocol) ? "https://mathieu-leplatre.info/piwik/" : "http://mathieu-leplatre.info/piwik/");
+    document.write(unescape("%3Cscript src='" + pkBaseURL + "piwik.js' type='text/javascript'%3E%3C/script%3E"));
+    </script><script type="text/javascript">
+    try {
+    var piwikTracker = Piwik.getTracker(pkBaseURL + "piwik.php", 1);
+    piwikTracker.trackPageView();
+    piwikTracker.enableLinkTracking();
+    } catch( err ) {}
+    </script><noscript><p><img src="http://mathieu-leplatre.info/piwik/piwik.php?idsite=1" style="border:0" alt="" /></p></noscript>
+<script type="text/javascript">
+    var disqus_shortname = 'mathieuleplatre';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
+</body>
+</html>

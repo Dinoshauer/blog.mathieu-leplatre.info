@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>Mathieu Leplatre - encoding</title>
+        <meta charset="utf-8" />
+        <link rel="stylesheet" href="http://blog.mathieu-leplatre.info/theme/css/main.css" type="text/css" />
+        <link href="http://blog.mathieu-leplatre.info/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Mathieu Leplatre Atom Feed" />
+
+        <!--[if IE]>
+                <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+        <!--[if lte IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="http://blog.mathieu-leplatre.info/css/ie.css"/>
+                <script src="http://blog.mathieu-leplatre.info/js/IE8.js" type="text/javascript"></script><![endif]-->
+
+        <!--[if lt IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="http://blog.mathieu-leplatre.info/css/ie6.css"/><![endif]-->
+
+</head>
+
+<body id="index" class="home">
+<a href="https://github.com/leplatrem">
+<img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork me on GitHub" />
+</a>
+        <header id="banner" class="body">
+                <h1><a href="http://blog.mathieu-leplatre.info/">Mathieu Leplatre </a></h1>
+                <nav><ul>
+                    <li><a href="http://blog.mathieu-leplatre.info/pages/about.html">About</a></li>
+                    <li ><a href="http://blog.mathieu-leplatre.info/category/dev.html">Dev</a></li>
+                    <li ><a href="http://blog.mathieu-leplatre.info/category/personal.html">Personal</a></li>
+                    <li ><a href="http://blog.mathieu-leplatre.info/category/sys.html">Sys</a></li>
+                    <li ><a href="http://blog.mathieu-leplatre.info/category/ux.html">Ux</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+        
+        
+
+            <aside id="featured" class="body">
+                <article>
+                    <h1 class="entry-title"><a href="http://blog.mathieu-leplatre.info/python-utf-8-print-fails-when-redirecting-stdout.html">Python UTF-8 print fails when redirecting stdout</a></h1> 
+<footer class="post-info">
+        <abbr class="published" title="2011-01-26T11:25:00+01:00">
+                Wed 26 January 2011
+        </abbr>
+
+        <address class="vcard author">
+                By <a class="url fn" href="http://blog.mathieu-leplatre.info/author/mathieu-leplatre.html">Mathieu Leplatre</a>
+        </address>
+<p>In <a href="http://blog.mathieu-leplatre.info/category/dev.html">Dev</a>. </p>
+<p>tags: <a href="http://blog.mathieu-leplatre.info/tag/python.html">python</a><a href="http://blog.mathieu-leplatre.info/tag/encoding.html">encoding</a><a href="http://blog.mathieu-leplatre.info/tag/shell.html">shell</a></p>
+</footer><!-- /.post-info --><p>Consider the following piece of code:</p>
+<div class="highlight"><pre><span class="c"># -*- coding: utf-8 -*-</span>
+<span class="k">print</span> <span class="s">u&quot;Վարդանաշեն&quot;</span>
+</pre></div>
+<p>Running this in a terminal works:</p>
+<div class="highlight"><pre><span class="nv">$ </span>python test.py
+Վարդանաշեն
+</pre></div>
+<p>Redirecting standard output to a file <strong>fails</strong>:</p>
+<div class="highlight"><pre><span class="nv">$ </span>python test.py &gt; file
+Traceback <span class="o">(</span>most recent call last<span class="o">)</span>:
+  File <span class="s2">&quot;test.py&quot;</span>, line 2, in &lt;module&gt;
+    print u<span class="s2">&quot;Վարդանաշեն&quot;</span>
+UnicodeEncodeError: <span class="s1">&#39;ascii&#39;</span> codec can<span class="err">&#39;</span>t encode characters in position 0-9: ordinal not in range<span class="o">(</span>128<span class="o">)</span>
+</pre></div>
+<p><a class="reference external" href="http://wiki.python.org/moin/PrintFails">Explanations are available on Python official wiki</a>: default encoding has to be forced.</p>
+<p>With an environment variable:</p>
+<div class="highlight"><pre><span class="nv">$ PYTHONIOENCODING</span><span class="o">=</span><span class="s1">&#39;utf_8&#39;</span>
+<span class="nv">$ </span><span class="nb">export </span>PYTHONIOENCODING
+<span class="nv">$ </span>python test.py &gt; file
+<span class="err">$</span>
+</pre></div>
+<p>With source modification:</p>
+<div class="highlight"><pre><span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">codecs</span>
+<span class="kn">import</span> <span class="nn">locale</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">stdout</span> <span class="o">=</span> <span class="n">codecs</span><span class="o">.</span><span class="n">getwriter</span><span class="p">(</span><span class="n">locale</span><span class="o">.</span><span class="n">getpreferredencoding</span><span class="p">())(</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
+</pre></div>
+<p>There are <a href="http://blog.mathieu-leplatre.info/python-utf-8-print-fails-when-redirecting-stdout.html#disqus_thread">comments</a>.</p>                </article>
+<p class="paginator">
+    Page 1 / 1
+</p>
+            </aside><!-- /#featured -->
+            </ol><!-- /#posts-list -->
+            </section><!-- /#content -->
+        <section id="extras" class="body">
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+                            <li><a href="http://blog.mathieu-leplatre.info/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="http://www.linkedin.com/in/leplatre">LinkedIn</a></li>
+                            <li><a href="https://code.launchpad.net/~mathieu.leplatre">Launchpad</a></li>
+                            <li><a href="https://github.com/leplatrem">GitHub</a></li>
+                            <li><a href="https://plus.google.com/u/0/106965745149150173373">Google+</a></li>
+                            <li><a href="http://twitter.com/leplatrem">Twitter</a></li>
+                            <li><a href="http://identi.ca/leplatrem">Identi.ca</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+        var pkBaseURL = (("https:" == document.location.protocol) ? "https://mathieu-leplatre.info/piwik/" : "http://mathieu-leplatre.info/piwik/");
+    document.write(unescape("%3Cscript src='" + pkBaseURL + "piwik.js' type='text/javascript'%3E%3C/script%3E"));
+    </script><script type="text/javascript">
+    try {
+    var piwikTracker = Piwik.getTracker(pkBaseURL + "piwik.php", 1);
+    piwikTracker.trackPageView();
+    piwikTracker.enableLinkTracking();
+    } catch( err ) {}
+    </script><noscript><p><img src="http://mathieu-leplatre.info/piwik/piwik.php?idsite=1" style="border:0" alt="" /></p></noscript>
+<script type="text/javascript">
+    var disqus_shortname = 'mathieuleplatre';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
+</body>
+</html>

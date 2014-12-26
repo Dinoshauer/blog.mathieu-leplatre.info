@@ -1,0 +1,1140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Mathieu Leplatre</title><link href="http://blog.mathieu-leplatre.info/" rel="alternate"></link><link href="http://blog.mathieu-leplatre.info/feeds/all-fr.atom.xml" rel="self"></link><id>http://blog.mathieu-leplatre.info/</id><updated>2012-04-18T00:00:00+02:00</updated><entry><title>Des cartes d'un autre monde, la suite</title><link href="http://blog.mathieu-leplatre.info/des-cartes-dun-autre-monde-la-suite-fr.html" rel="alternate"></link><updated>2012-04-18T00:00:00+02:00</updated><author><name>Mathieu Leplatre</name></author><id>tag:blog.mathieu-leplatre.info,2012-04-18:des-cartes-dun-autre-monde-la-suite-fr.html</id><summary type="html">&lt;div class="section" id="bravo-aux-organisateurs"&gt;
+&lt;h2&gt;Bravo aux organisateurs !&lt;/h2&gt;
+&lt;p&gt;L'édition 2012 des rencontres Django-fr a mis la barre très haut ! Ce fut un plaisir
+de retrouver, ou rencontrer, autant de gens sympathiques et intéressants dans un cadre
+aussi agréable :)&lt;/p&gt;
+&lt;p&gt;Comme l'a souligné Olivier &lt;a class="footnote-reference" href="#id3" id="id1"&gt;[1]&lt;/a&gt;, cela va bien au delà de la techno qui fédère la communauté ;
+les membres partagent aussi un esprit, une vision, des approches, qui transpassent
+l'outil ! Agilité, pragmatisme, KISS, DRY, PEP20...&lt;/p&gt;
+&lt;p&gt;Au menu, les problématiques de scaling étaient prédominantes, Django propulse des sites à
+gros volume, comme &lt;em&gt;Liberation.fr&lt;/em&gt;, &lt;em&gt;20minutes.fr&lt;/em&gt;, &lt;em&gt;Mozilla&lt;/em&gt;, &lt;em&gt;Autolib&lt;/em&gt;, représentés
+pendant ces rencontres, mais aussi &lt;em&gt;Instagram&lt;/em&gt;, &lt;em&gt;Lanyrd&lt;/em&gt;, &lt;em&gt;Disqus&lt;/em&gt;... autant d'expériences à partager!
+Ce fut aussi un honneur d'accueillir deux invités nord-américains, python Lords chez &lt;em&gt;Heroku&lt;/em&gt;.&lt;/p&gt;
+&lt;p&gt;Cette année, je présentais une approche à contre-courant pour publier des données
+cartographiques sur le Web :&lt;/p&gt;
+&lt;blockquote&gt;
+“ Comment publier des données cartographiques, aussi simplement qu'on
+publie une image ? Il existe un monde où Django expose lui-même des
+cartes interactives, sans déployer l'artillerie habituelle !
+Une approche à contre-courant se prêtant parfaitement à la mise en
+valeur quasi-immédiate d'informations geographiques, comme celles
+libérées par votre ville ! ”&lt;/blockquote&gt;
+&lt;iframe src="http://www.slideshare.net/slideshow/embed_code/12698176" width="560" height="432" frameborder="0" marginwidth="0" marginheight="0" scrolling="no"&gt;&lt;/iframe&gt;&lt;p&gt;&lt;strong&gt;Pour résumer&lt;/strong&gt; : éloignons-nous de l'OGC (WMS, WFS,...) quand il s'agit
+juste de publier une carte sur une page Web.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="comment-rafraichir-les-cartes"&gt;
+&lt;h2&gt;Comment rafraîchir les cartes ?&lt;/h2&gt;
+&lt;p&gt;Je reprends une citation remontée par &lt;em&gt;twidi&lt;/em&gt; :&lt;/p&gt;
+&lt;blockquote&gt;
+“ There are only two hard things in Computer Science: cache invalidation and naming things ”
+-- Phil Karlton&lt;/blockquote&gt;
+&lt;p&gt;Selon la fréquence de rafraichissement de vos données, plusieurs stratégies sont
+envisageables. Surtout qu'il est rare que l'ensemble de la carte nécessite d'être actualisé.&lt;/p&gt;
+&lt;div class="section" id="en-generant-les-tuiles-en-temps-reel"&gt;
+&lt;h3&gt;En générant les tuiles en temps réel&lt;/h3&gt;
+&lt;p&gt;Comme l'expliquait Young Yahn &lt;a class="footnote-reference" href="#id4" id="id2"&gt;[2]&lt;/a&gt;, générer des tuiles en temps réel demande
+d'avoir une architecture assez trappue et cela s'avère stressant à administrer.&lt;/p&gt;
+&lt;p&gt;Cependant c'est possible avec des outils comme &lt;em&gt;tilelive&lt;/em&gt; ou &lt;em&gt;renderd&lt;/em&gt; (Apache &lt;em&gt;mod_tile&lt;/em&gt;).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="avec-une-tache-planifiee"&gt;
+&lt;h3&gt;Avec une tâche planifiée&lt;/h3&gt;
+&lt;p&gt;Il faut trouver le compromis entre le temps de fabrication de la carte et la fréquence
+de rafraichissement des données source.&lt;/p&gt;
+&lt;p&gt;S'il s'agit de minutes, rafraichir la carte toutes les heures semble envisageable. La plupart du
+temps, une fois par jour suffira.&lt;/p&gt;
+&lt;p&gt;Il existe plusieurs outils, comme &lt;a class="reference external" href="/render-your-tilemill-stylesheets-with-landez.html"&gt;landez&lt;/a&gt;,
+pour regénérer à intervales réguliers votre carte issue de &lt;em&gt;Tilemill&lt;/em&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="a-la-seconde"&gt;
+&lt;h3&gt;À la seconde&lt;/h3&gt;
+&lt;p&gt;Pour suivre une flotte de bateaux ou de véhicules, il faut que les éléments soient
+déplacés en temps réel sur la carte.&lt;/p&gt;
+&lt;p&gt;Il y a plusieurs outils très efficaces qui se reposent sur les Websockets. J'avais
+fait l'application &lt;a class="reference external" href="/des-cartes-collaboratives-avec-livetitude-fr.html"&gt;Livetitude&lt;/a&gt;,
+&lt;a class="reference external" href="http://vivid-warrior-6693.herokuapp.com"&gt;disponible en ligne&lt;/a&gt;, qui permet
+d'éditer à plusieurs une carte de marqueurs, grace à &lt;em&gt;Pusher&lt;/em&gt;.&lt;/p&gt;
+&lt;p&gt;La bibliothèque &lt;em&gt;Sharejs&lt;/em&gt;, issue du projet défunt Google Wave, permettrait d'aller
+plus loin en faisant de l'édition collaborative d'attributs de géométries.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="en-fonction-de-filtres-ou-formulaires"&gt;
+&lt;h3&gt;En fonction de filtres ou formulaires&lt;/h3&gt;
+&lt;p&gt;Pour redessiner la carte en fonction de filtres, sur des attributs par exemple, l'utilisation
+du format GeoJSON s'avère assez efficace.&lt;/p&gt;
+&lt;p&gt;Votre serveur reçoit le formulaire, construit le jeu de données, et renvoie les
+résultats (&lt;em&gt;Features = geometries + attributs&lt;/em&gt;).&lt;/p&gt;
+&lt;p&gt;Cette approche peut s'avérer délicate selon la taille des jeux de données. Plusieurs
+ruses existent afin de limiter le volume (ex: généralisation progressive selon la zone affichée)&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="carte-a-echelle-unique"&gt;
+&lt;h2&gt;Carte à échelle unique&lt;/h2&gt;
+&lt;p&gt;Parfois, pour certaines cartes, une seule vue suffit ! Nul besoin de zoomer, puisque le
+phénomène intervient à une échelle en particulier !&lt;/p&gt;
+&lt;p&gt;Pensez aux cartes des journaux ! Et vous serez séduits par l'excellent &lt;em&gt;Kartograph&lt;/em&gt;,
+qui permet de publier des cartes sublimes facilement. Le SVG est manipulable en Javascript,
+et permet d'ajouter des évènements sur les zones.&lt;/p&gt;
+&lt;p&gt;Martin Dewulf a publié &lt;a class="reference external" href="http://migrationsmap.net"&gt;une jolie carte interactive à partir de données ouvertes&lt;/a&gt;.
+Le résultat est très convaincaint, et sort de l'ordinaire.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="requiem-pour-les-trolls"&gt;
+&lt;h2&gt;Requiem pour les trolls&lt;/h2&gt;
+&lt;p&gt;La citation au début de la présentation, issue de &lt;em&gt;#whereconf&lt;/em&gt;, était volontairement
+provocatrice. Mais de nombreux acteurs du Web et de la cartographie rejoignent
+cette idée. Par exemple, entre temps, Sean Gillies a réitéré :&lt;/p&gt;
+&lt;blockquote&gt;
+“ How many MapBox and CartoDB like products would there be today if the
+Open Source GIS community hadn't gone on a decade long WxS wander? “
+-- &amp;#64;sgillies, 2012&lt;/blockquote&gt;
+&lt;div class="section" id="oriente-communication"&gt;
+&lt;h3&gt;Orienté communication&lt;/h3&gt;
+&lt;p&gt;En 12 minutes, c'est très difficile de présenter tous les aspects, inconvénients
+et avantages d'une approche à contre-courant !&lt;/p&gt;
+&lt;p&gt;J'ai présenté le besoin plus simple de la cartographie sur le Web :&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;j'ai des données à caractère géographique ;&lt;/li&gt;
+&lt;li&gt;je veux les afficher sur une page Web avec une carte interactive.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Le cas le plus simple, mais en même temps le plus répandu !&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="pas-toujours-d-alternatives-a-l-ogc"&gt;
+&lt;h3&gt;Pas toujours d'alternatives à l'OGC&lt;/h3&gt;
+&lt;p&gt;Dans certains contextes, les protocoles OGC sont indispensables :&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;interroperabilité entre systèmes hétérogènes sans médiation préalable (&lt;em&gt;serveurs externes, logiciels propriétaires, etc.&lt;/em&gt;);&lt;/li&gt;
+&lt;li&gt;catalogage sémantique et syndication des jeux de données (&lt;em&gt;INSPIRE&lt;/em&gt;)&lt;/li&gt;
+&lt;li&gt;construction d'une plateforme IDS&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;em&gt;OpenLayers&lt;/em&gt; est la seule bibliothèque javascript qui a les reins assez solides pour
+s'intégrer dans ces environnements.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="savoir-oublier-le-web"&gt;
+&lt;h3&gt;Savoir oublier le Web&lt;/h3&gt;
+&lt;p&gt;Il faut savoir juger la pertinence d'une application Web. Dans certaines situations,
+le Web n'est pas la seule solution pour faire du client-server en multi-utilisateurs.&lt;/p&gt;
+&lt;p&gt;L'année dernière par exemple, nous avons développé une application collaborative
+pour manipuler des tronçons routiers. Nous avons &lt;a class="reference external" href="/merkopolo-a-simple-yet-powerful-starter-kit-for-your-qtc-gis-application.html"&gt;choisi C++/Qt&lt;/a&gt;,
+avec PostGIS et des &lt;a class="reference external" href="/access-a-json-webservice-with-qt-c.html"&gt;webservices JSON&lt;/a&gt;,
+parce que c'est ce qui se prêtait le mieux au besoin ! La même chose en &lt;em&gt;ExtJS&lt;/em&gt; aurait
+été catastrophique !&lt;/p&gt;
+&lt;iframe width="560" height="315" src="http://www.youtube.com/embed/7NPQo54NbJ8" frameborder="0" allowfullscreen&gt;&lt;/iframe&gt;&lt;table class="docutils footnote" frame="void" id="id3" rules="none"&gt;
+&lt;colgroup&gt;&lt;col class="label" /&gt;&lt;col /&gt;&lt;/colgroup&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id1"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a class="reference external" href="https://twitter.com/#!/oloynet/status/192295759431995393"&gt;oloynet&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;table class="docutils footnote" frame="void" id="id4" rules="none"&gt;
+&lt;colgroup&gt;&lt;col class="label" /&gt;&lt;col /&gt;&lt;/colgroup&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id2"&gt;[2]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a class="reference external" href="http://mapbox.com/blog/rendering-the-world/"&gt;Rendering the World, FOSS4G NA, 2012&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</summary><category term="django"></category><category term="web"></category><category term="gis"></category><category term="livetitude"></category></entry><entry><title>Des cartes collaboratives avec Livetitude</title><link href="http://blog.mathieu-leplatre.info/des-cartes-collaboratives-avec-livetitude-fr.html" rel="alternate"></link><updated>2011-11-23T14:00:00+01:00</updated><author><name>Mathieu Leplatre</name></author><id>tag:blog.mathieu-leplatre.info,2011-11-23:des-cartes-collaboratives-avec-livetitude-fr.html</id><summary type="html">&lt;p&gt;&lt;em&gt;Article original publié chez&lt;/em&gt; &lt;a class="reference external" href="http://makina-corpus.org"&gt;Makina Corpus&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Cela fait plusieurs semaines que je voulais présenter ma petite application
+de partage de cartes, dont je me sers déjà comme alternative aux marqueurs de Google Maps.&lt;/p&gt;
+&lt;div class="section" id="en-bref"&gt;
+&lt;h2&gt;En bref&lt;/h2&gt;
+&lt;p&gt;&lt;a class="reference external" href="https://github.com/makinacorpus/livetitude"&gt;Livetitude&lt;/a&gt; est un outil Web pour créer des cartes de manière collaborative
+&lt;strong&gt;en temps réel&lt;/strong&gt; (à la manière d'un &lt;a class="reference external" href="http://fr.wikipedia.org/wiki/EtherPad"&gt;pad&lt;/a&gt;).&lt;/p&gt;
+&lt;p&gt;Fonctionnant sur des terminaux mobiles, Livetitude permet également de partager la position des collaborateurs de la carte,
+d'exporter les données au format GeoJSON ou de publier la carte sur une page Web.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="sous-le-capot"&gt;
+&lt;h2&gt;Sous le capot&lt;/h2&gt;
+&lt;p&gt;J'ai pris du plaisir à hacker cette application, elle tire profit
+d'outils très simples mais très efficaces :&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference external" href="http://http://leaflet.cloudmade.com"&gt;Leaflet&lt;/a&gt; pour afficher les cartes ;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference external" href="http://pusher.com"&gt;Pusher&lt;/a&gt; (Websockets) pour la collaboration en temps réel ;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference external" href="http://couchdb.apache.org/"&gt;CouchDB&lt;/a&gt; pour stocker les données ;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference external" href="http://flask.pocoo.org"&gt;Flask&lt;/a&gt; pour servir les pages ;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference external" href="http://www.heroku.com"&gt;Heroku&lt;/a&gt; pour héberger l'application.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Bien entendu, le code source est libre et disponible sur &lt;a class="reference external" href="https://github.com/makinacorpus/livetitude"&gt;le GitHub de Makina Corpus&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="utilisation"&gt;
+&lt;h2&gt;Utilisation&lt;/h2&gt;
+&lt;p&gt;Une instance est &lt;a class="reference external" href="http://vivid-warrior-6693.herokuapp.com/"&gt;déployée en ligne&lt;/a&gt;, dans le cloud d'Heroku,
+dont vous pouvez vous servir, &lt;em&gt;pour une utilisation en bon père de famille&lt;/em&gt; :)&lt;/p&gt;
+&lt;p&gt;Les marqueurs peuvent contenir du texte ou de l'HTML, et aucune donnée de localisation des visiteurs n'est stockée.&lt;/p&gt;
+&lt;img alt="" src="/images/livetitude-poc.png" /&gt;
+&lt;div class="section" id="comment-publier-vos-donnees-existantes"&gt;
+&lt;h3&gt;Comment publier vos données existantes ?&lt;/h3&gt;
+&lt;p&gt;Si vous souhaitez publier et visualiser vos marqueurs sur une carte de Livetitude,
+il suffit de poster (&lt;tt class="docutils literal"&gt;POST&lt;/tt&gt;) les coordonnées de vos points sur l'URL &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;http://server/&amp;lt;CARTE&amp;gt;/add&lt;/span&gt;&lt;/tt&gt;.&lt;/p&gt;
+&lt;p&gt;Par exemple, avec une petite fonction python :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;httplib&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nn"&gt;urllib&lt;/span&gt;
+
+&lt;span class="n"&gt;SERVER&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;server&amp;quot;&lt;/span&gt;  &lt;span class="c"&gt;# e.g. vivid-warrior-6693.herokuapp.com&lt;/span&gt;
+
+&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;publish&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;mapname&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;coords&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;data&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="n"&gt;url&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;/&lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="s"&gt;/add&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;%&lt;/span&gt; &lt;span class="n"&gt;mapname&lt;/span&gt;
+    &lt;span class="n"&gt;request&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+       &lt;span class="s"&gt;&amp;#39;coords&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;coords&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+       &lt;span class="s"&gt;&amp;#39;data&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;data&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+       &lt;span class="s"&gt;&amp;#39;classid&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;5&lt;/span&gt;  &lt;span class="c"&gt;# (=color)&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+    &lt;span class="n"&gt;params&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;urllib&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;urlencode&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;headers&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Content-type&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;application/x-www-form-urlencoded&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+               &lt;span class="s"&gt;&amp;quot;Accept&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;text/plain&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+    &lt;span class="n"&gt;conn&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;httplib&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;HTTPConnection&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;SERVER&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;conn&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;POST&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;params&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;headers&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;response&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;conn&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;getresponse&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="n"&gt;response&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;status&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;response&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;reason&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;response&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;read&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+    &lt;span class="n"&gt;conn&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;close&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+
+
+&lt;span class="n"&gt;publish&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;PasLoin&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;10.1,54.9&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Super resto!&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;publish&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;PasLoin&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;19.4,65.1&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Bon mojito&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Les points sont alors visibles en ligne sur &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;http://server/PasLoin&lt;/span&gt;&lt;/tt&gt; ou
+disponible en GeoJSON sur &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;http://server/PasLoin/points&lt;/span&gt;&lt;/tt&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="contribuer"&gt;
+&lt;h2&gt;Contribuer&lt;/h2&gt;
+&lt;p&gt;Livetitude est une application très simple, à l'état de preuve de concept. Mais
+le code source est très réduit et donc très rapide à prendre en main !&lt;/p&gt;
+&lt;p&gt;Toutes vos &lt;a class="reference external" href="https://github.com/makinacorpus/livetitude/issues"&gt;suggestions ou contributions&lt;/a&gt; sont les bienvenues !&lt;/p&gt;
+&lt;/div&gt;
+</summary><category term="maps"></category><category term="gis"></category><category term="websockets"></category><category term="leaflet"></category><category term="heroku"></category></entry><entry><title>Git : annuler proprement un commit après un push</title><link href="http://blog.mathieu-leplatre.info/git-annuler-proprement-un-commit-apres-un-push-fr.html" rel="alternate"></link><updated>2011-11-03T14:15:00+01:00</updated><author><name>Mathieu Leplatre</name></author><id>tag:blog.mathieu-leplatre.info,2011-11-03:git-annuler-proprement-un-commit-apres-un-push-fr.html</id><summary type="html">&lt;div class="section" id="ce-qu-il-faut-eviter"&gt;
+&lt;h2&gt;Ce qu'il faut éviter&lt;/h2&gt;
+&lt;p&gt;Pour annuler des commits, il existe la commande &lt;tt class="docutils literal"&gt;git reset&lt;/tt&gt;.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;git reset --hard HEAD~1
+HEAD is now at 444b1cf Rhoo
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Celle-ci est pertinente tant que les commits n'ont pas été poussés. Git vous retiendra au &lt;tt class="docutils literal"&gt;push&lt;/tt&gt; d'ailleurs :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;git push
+To /tmp/repo
+ ! &lt;span class="o"&gt;[&lt;/span&gt;rejected&lt;span class="o"&gt;]&lt;/span&gt;        master -&amp;gt; master &lt;span class="o"&gt;(&lt;/span&gt;non-fast-forward&lt;span class="o"&gt;)&lt;/span&gt;
+error: failed to push some refs to &lt;span class="s1"&gt;&amp;#39;/tmp/repo&amp;#39;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;En effet, à partir du moment où un commit existe sur le serveur, il est potentiellement utilisé
+par des collaborateurs (&lt;em&gt;mergé, à la base d'une branche, etc.&lt;/em&gt;). On pourrait faire le sale et forcer le push :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;git push -f
+Total &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;delta 0&lt;span class="o"&gt;)&lt;/span&gt;, reused &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;delta 0&lt;span class="o"&gt;)&lt;/span&gt;
+To /tmp/repo
+ + b67c343...444b1cf master -&amp;gt; master &lt;span class="o"&gt;(&lt;/span&gt;forced update&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Mais il y a beaucoup mieux !&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="ce-qu-il-faut-faire"&gt;
+&lt;h2&gt;Ce qu'il faut faire&lt;/h2&gt;
+&lt;p&gt;Annuler un commit, c'est finalement appliquer l'inverse de son &lt;strong&gt;diff&lt;/strong&gt; !&lt;/p&gt;
+&lt;p&gt;On peut rediriger le diff des commits à annuler vers la commande &lt;tt class="docutils literal"&gt;patch &lt;span class="pre"&gt;--reverse&lt;/span&gt;&lt;/tt&gt; :)&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;git diff HEAD^ &lt;span class="p"&gt;|&lt;/span&gt; patch --reverse
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Pour faire plus simple, il y a &lt;tt class="docutils literal"&gt;git revert&lt;/tt&gt; !&lt;/p&gt;
+&lt;p&gt;Par exemple pour annuler les trois derniers commits :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;git revert HEAD~3..HEAD
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Ou pour annuler un commit en particulier :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;git revert 444b1cff
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Il suffit alors de pousser proprement le commit obtenu sur le
+serveur. Les éventuels collaborateurs qui avaient basé leur travail sur les commits
+annulés devront gérer les conflits au moment venu...&lt;/p&gt;
+&lt;/div&gt;
+</summary><category term="git"></category><category term="tips"></category></entry><entry><title>Une démo squelettique de python Flask CouchDB</title><link href="http://blog.mathieu-leplatre.info/une-demo-squelettique-de-python-flask-couchdb-fr.html" rel="alternate"></link><updated>2011-10-11T11:30:00+02:00</updated><author><name>Mathieu Leplatre</name></author><id>tag:blog.mathieu-leplatre.info,2011-10-11:une-demo-squelettique-de-python-flask-couchdb-fr.html</id><summary type="html">&lt;p&gt;Avec &lt;tt class="docutils literal"&gt;Flask&lt;/tt&gt; et &lt;tt class="docutils literal"&gt;Couchdb&lt;/tt&gt; (e.g. &lt;a class="reference external" href="http://packages.python.org/Flask-CouchDB/"&gt;Flask-CouchDB&lt;/a&gt;),
+on peut faire rapidement des trucs amusants, voire très utiles !&lt;/p&gt;
+&lt;p&gt;Voici un &lt;strong&gt;squelette&lt;/strong&gt; d'application, fonctionnel, qui stocke et récupère des objets crées à partir de posts HTTP.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;simplejson&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;flask&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;Flask&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;request&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;couchdb.design&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;ViewDefinition&lt;/span&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;flaskext.couchdb&lt;/span&gt;
+
+
+&lt;span class="n"&gt;app&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;Flask&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;__name__&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="sd"&gt;&amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
+&lt;span class="sd"&gt;CouchDB permanent view&lt;/span&gt;
+&lt;span class="sd"&gt;&amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
+&lt;span class="n"&gt;docs_by_author&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;ViewDefinition&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;docs&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;byauthor&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+                                &lt;span class="s"&gt;&amp;#39;function(doc) { emit(doc.author, doc); }&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="sd"&gt;&amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
+&lt;span class="sd"&gt;Retrieve docs&lt;/span&gt;
+&lt;span class="sd"&gt;&amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
+&lt;span class="nd"&gt;@app.route&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;/&amp;lt;author_id&amp;gt;/docs&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;docs&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;author_id&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="n"&gt;docs&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[]&lt;/span&gt;
+    &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;row&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;docs_by_author&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;couch&lt;/span&gt;&lt;span class="p"&gt;)[&lt;/span&gt;&lt;span class="n"&gt;author_id&lt;/span&gt;&lt;span class="p"&gt;]:&lt;/span&gt;
+        &lt;span class="n"&gt;docs&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;append&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;row&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;value&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;simplejson&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;dumps&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;docs&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="sd"&gt;&amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
+&lt;span class="sd"&gt;Add doc&lt;/span&gt;
+&lt;span class="sd"&gt;&amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
+&lt;span class="nd"&gt;@app.route&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;/&amp;lt;author_id&amp;gt;/add&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;methods&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;POST&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;
+&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;add_doc&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;author_id&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="k"&gt;try&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+        &lt;span class="c"&gt;# Build doc with posted values&lt;/span&gt;
+        &lt;span class="n"&gt;doc&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;author&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;author_id&lt;/span&gt; &lt;span class="p"&gt;}&lt;/span&gt;
+        &lt;span class="n"&gt;doc&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;update&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;form&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="c"&gt;# Insert into database&lt;/span&gt;
+        &lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;couch&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;save&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;doc&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="n"&gt;state&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;True&lt;/span&gt;
+    &lt;span class="k"&gt;except&lt;/span&gt; &lt;span class="ne"&gt;Exception&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;e&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+        &lt;span class="n"&gt;state&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;False&lt;/span&gt;
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;simplejson&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;dumps&lt;/span&gt;&lt;span class="p"&gt;({&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;ok&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;state&lt;/span&gt;&lt;span class="p"&gt;})&lt;/span&gt;
+
+&lt;span class="sd"&gt;&amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
+&lt;span class="sd"&gt;Flask main&lt;/span&gt;
+&lt;span class="sd"&gt;&amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;__name__&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;__main__&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+    &lt;span class="n"&gt;app&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;config&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;update&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+        &lt;span class="n"&gt;DEBUG&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;True&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="n"&gt;COUCHDB_SERVER&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;http://localhost:5984/&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="n"&gt;COUCHDB_DATABASE&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;docsdemo&amp;#39;&lt;/span&gt;
+    &lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;manager&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;flaskext&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;couchdb&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;CouchDBManager&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+    &lt;span class="n"&gt;manager&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;setup&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;app&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;manager&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;add_viewdef&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;docs_by_author&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;  &lt;span class="c"&gt;# Install the view&lt;/span&gt;
+    &lt;span class="n"&gt;manager&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sync&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;app&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;app&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;run&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;host&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;0.0.0.0&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;port&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;5000&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;J'ai déposé ce snippet sur &lt;a class="reference external" href="https://gist.github.com/1277655"&gt;Gist&lt;/a&gt; si besoin.&lt;/p&gt;
+&lt;p&gt;On peut attaquer l'application avec &lt;tt class="docutils literal"&gt;curl&lt;/tt&gt; :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;curl -d &lt;span class="s2"&gt;&amp;quot;title=Globalia&amp;amp;year=2004&amp;quot;&lt;/span&gt; http://0.0.0.0:5000/jc.rufin/add
+&lt;span class="o"&gt;{&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;ok&amp;quot;&lt;/span&gt;: &lt;span class="nb"&gt;true&lt;/span&gt;&lt;span class="o"&gt;}&lt;/span&gt;
+&lt;span class="nv"&gt;$ &lt;/span&gt;curl -d &lt;span class="s2"&gt;&amp;quot;title=Red%20Brazil&amp;amp;contest=goncourt&amp;quot;&lt;/span&gt; http://0.0.0.0:5000/jc.rufin/add
+&lt;span class="o"&gt;{&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;ok&amp;quot;&lt;/span&gt;: &lt;span class="nb"&gt;true&lt;/span&gt;&lt;span class="o"&gt;}&lt;/span&gt;
+
+&lt;span class="nv"&gt;$ &lt;/span&gt;curl http://0.0.0.0:5000/jc.rufin/docs
+&lt;span class="o"&gt;[{&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;title&amp;quot;&lt;/span&gt;: &lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Globalia&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;, &lt;span class="s2"&gt;&amp;quot;year&amp;quot;&lt;/span&gt;: &lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;2004&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;, &lt;span class="s2"&gt;&amp;quot;author&amp;quot;&lt;/span&gt;: &lt;span class="s2"&gt;&amp;quot;jc.rufin&amp;quot;&lt;/span&gt;, &lt;span class="s2"&gt;&amp;quot;_rev&amp;quot;&lt;/span&gt;: &lt;span class="s2"&gt;&amp;quot;1-3195...fbc8&amp;quot;&lt;/span&gt;, &lt;span class="s2"&gt;&amp;quot;_id&amp;quot;&lt;/span&gt;: &lt;span class="s2"&gt;&amp;quot;dec81d...1733c&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;}&lt;/span&gt;,
+&lt;span class="o"&gt;{&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;title&amp;quot;&lt;/span&gt;: &lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Red Brazil&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;, &lt;span class="s2"&gt;&amp;quot;contest&amp;quot;&lt;/span&gt;: &lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;goncourt&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;, &lt;span class="s2"&gt;&amp;quot;author&amp;quot;&lt;/span&gt;: &lt;span class="s2"&gt;&amp;quot;jc.rufin&amp;quot;&lt;/span&gt;, &lt;span class="s2"&gt;&amp;quot;_rev&amp;quot;&lt;/span&gt;: &lt;span class="s2"&gt;&amp;quot;1-7b15...a9a2&amp;quot;&lt;/span&gt;, &lt;span class="s2"&gt;&amp;quot;_id&amp;quot;&lt;/span&gt;: &lt;span class="s2"&gt;&amp;quot;dec81dc...17c0c&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;}]&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;N'oubliez pas de colorier les cases à votre guise, sinon ce squelette ne sert à rien, le JSON étant déjà la langue maternelle de CouchDB.&lt;/p&gt;
+</summary><category term="python"></category><category term="couchdb"></category><category term="flask"></category></entry><entry><title>Mes premiers pas avec Heroku</title><link href="http://blog.mathieu-leplatre.info/mes-premiers-pas-avec-heroku-fr.html" rel="alternate"></link><updated>2011-10-10T10:30:00+02:00</updated><author><name>Mathieu Leplatre</name></author><id>tag:blog.mathieu-leplatre.info,2011-10-10:mes-premiers-pas-avec-heroku-fr.html</id><summary type="html">&lt;p&gt;J'ai pris le temps de tester la plateforme &lt;a class="reference external" href="http://www.heroku.com"&gt;Heroku&lt;/a&gt;, qui fait pas mal de bruit
+en ce moment.&lt;/p&gt;
+&lt;p&gt;L'idée est simple : le développeur pousse son code dans une branche Git
+pour déployer son application. Ils se chargent du reste.&lt;/p&gt;
+&lt;p&gt;La &lt;a class="reference external" href="http://devcenter.heroku.com/articles/python"&gt;documentation pour déployer du python&lt;/a&gt; est bien faite.&lt;/p&gt;
+&lt;div class="section" id="heroku-et-virtualenv"&gt;
+&lt;h2&gt;heroku et virtualenv&lt;/h2&gt;
+&lt;p&gt;Pour commencer, j'ai installé l'outil &lt;tt class="docutils literal"&gt;heroku&lt;/tt&gt; en ruby (sic), dans un &lt;em&gt;virtualenv&lt;/em&gt;&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+sudo aptitude install rubygems
+
+virtualenv --no-site-packages env
+source env/bin/activate
+&lt;/pre&gt;
+&lt;p&gt;Merci à Bruno, qui nous a expliqué récemment &lt;a class="reference external" href="http://bruno.im/2011/sep/29/streamline-your-django-workflow/"&gt;comment faire cohabiter les gems ruby et virtualenv&lt;/a&gt;&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+export GEM_HOME=&amp;quot;$VIRTUAL_ENV/gems&amp;quot;
+export GEM_PATH=&amp;quot;&amp;quot;
+export PATH=$PATH:$GEM_HOME/bin
+&lt;/pre&gt;
+&lt;p&gt;(À ajouter au hook dans &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;~/.virtualenvs/postactivate&lt;/span&gt;&lt;/tt&gt; pour plus tard)&lt;/p&gt;
+&lt;p&gt;Pour terminer, il suffit de poser le &lt;em&gt;gem&lt;/em&gt;&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+gem install heroku
+&lt;/pre&gt;
+&lt;p&gt;Et j'ai bien &lt;tt class="docutils literal"&gt;heroku&lt;/tt&gt; cloisonné dans le &lt;em&gt;virtualenv&lt;/em&gt;.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="o"&gt;(&lt;/span&gt;env&lt;span class="o"&gt;)&lt;/span&gt;src&lt;span class="nv"&gt;$ &lt;/span&gt;which heroku
+/home/mathieu/path/env/gems/bin/heroku
+
+&lt;span class="o"&gt;(&lt;/span&gt;env&lt;span class="o"&gt;)&lt;/span&gt;src&lt;span class="nv"&gt;$ &lt;/span&gt;heroku &lt;span class="nb"&gt;help&lt;/span&gt;
+Usage: heroku COMMAND &lt;span class="o"&gt;[&lt;/span&gt;--app APP&lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="nb"&gt;command&lt;/span&gt;-specific-options&lt;span class="o"&gt;]&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="heroku-et-la-configuration-de-l-application"&gt;
+&lt;h2&gt;heroku et la Configuration de l'Application&lt;/h2&gt;
+&lt;p&gt;Pour apprivoiser la plateforme, j'ai utilisé le &lt;em&gt;micro&lt;/em&gt;-framework &lt;a class="reference external" href="http://flask.pocoo.org/"&gt;Flask&lt;/a&gt;,
+suggéré dans le tutorial python. C'est ultra-simple, ultra-léger, ultra-tout.&lt;/p&gt;
+&lt;p&gt;Afin de gérer ma configuration, j'ai créé une classe &lt;tt class="docutils literal"&gt;Settings&lt;/tt&gt; qui utilise les variables d'environment:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;# settings.py&lt;/span&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;os&lt;/span&gt;
+
+&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Settings&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;object&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="n"&gt;DEBUG&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;bool&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;os&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;environ&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;DEBUG&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+    &lt;span class="n"&gt;TESTING&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;bool&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;os&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;environ&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;TESTING&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+    &lt;span class="n"&gt;PORT&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;int&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;os&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;environ&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;PORT&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;5000&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+    &lt;span class="n"&gt;HOST&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;os&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;environ&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;HOST&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;0.0.0.0&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Que je branche dans l'application :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;# app.py&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;flask&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;Flask&lt;/span&gt;
+
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;settings&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;Settings&lt;/span&gt;
+
+
+&lt;span class="n"&gt;app&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;Flask&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;__name__&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;settings&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;Settings&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+
+&lt;span class="c"&gt;#...&lt;/span&gt;
+
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;__name__&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;__main__&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+    &lt;span class="c"&gt;# ...&lt;/span&gt;
+    &lt;span class="n"&gt;app&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;config&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;from_object&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;settings&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Ensuite grâce au client &lt;tt class="docutils literal"&gt;heroku&lt;/tt&gt;, je peux contrôler à distance
+la configuration de mon application, qui est redémarrée à chaque changement :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="o"&gt;(&lt;/span&gt;env&lt;span class="o"&gt;)&lt;/span&gt;src&lt;span class="nv"&gt;$ &lt;/span&gt;heroku config
+&lt;span class="nv"&gt;PATH&lt;/span&gt;              &lt;span class="o"&gt;=&lt;/span&gt;&amp;gt; bin:/usr/local/bin:/usr/bin:/bin
+&lt;span class="nv"&gt;PYTHONUNBUFFERED&lt;/span&gt;  &lt;span class="o"&gt;=&lt;/span&gt;&amp;gt; &lt;span class="nb"&gt;true&lt;/span&gt;
+
+&lt;span class="o"&gt;(&lt;/span&gt;env&lt;span class="o"&gt;)&lt;/span&gt;src&lt;span class="nv"&gt;$ &lt;/span&gt;heroku config:add &lt;span class="nv"&gt;DEBUG&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;True
+Adding config vars:
+  &lt;span class="nv"&gt;DEBUG&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt;&amp;gt; True
+Restarting app... &lt;span class="k"&gt;done&lt;/span&gt;, v19.
+
+&lt;span class="o"&gt;(&lt;/span&gt;env&lt;span class="o"&gt;)&lt;/span&gt;src&lt;span class="nv"&gt;$ &lt;/span&gt;heroku config
+&lt;span class="nv"&gt;DEBUG&lt;/span&gt;             &lt;span class="o"&gt;=&lt;/span&gt;&amp;gt; True
+&lt;span class="nv"&gt;PATH&lt;/span&gt;              &lt;span class="o"&gt;=&lt;/span&gt;&amp;gt; bin:/usr/local/bin:/usr/bin:/bin
+&lt;span class="nv"&gt;PYTHONUNBUFFERED&lt;/span&gt;  &lt;span class="o"&gt;=&lt;/span&gt;&amp;gt; &lt;span class="nb"&gt;true&lt;/span&gt;
+
+&lt;span class="o"&gt;(&lt;/span&gt;env&lt;span class="o"&gt;)&lt;/span&gt;src&lt;span class="nv"&gt;$ &lt;/span&gt;heroku config:remove DEBUG
+Removing DEBUG and restarting app... &lt;span class="k"&gt;done&lt;/span&gt;, v20.
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Je peux revenir en arrière quand un changement de config a posé problème :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="o"&gt;(&lt;/span&gt;env&lt;span class="o"&gt;)&lt;/span&gt;src&lt;span class="nv"&gt;$ &lt;/span&gt;heroku releases
+Rel   Change                          By                    When
+----  ----------------------          ----------            ----------
+v20   Config remove DEBUG             your@mail.com         &lt;span class="m"&gt;25&lt;/span&gt; seconds ago
+v19   Config add DEBUG                your@mail.com         &lt;span class="m"&gt;1&lt;/span&gt; minute ago
+
+
+&lt;span class="o"&gt;(&lt;/span&gt;env&lt;span class="o"&gt;)&lt;/span&gt;src&lt;span class="nv"&gt;$ &lt;/span&gt;heroku rollback v19
+Rolled back to v19
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+</summary><category term="python"></category><category term="flask"></category><category term="tips"></category><category term="heroku"></category></entry><entry><title>Avec Git rebase, vos arbres poussent droit</title><link href="http://blog.mathieu-leplatre.info/avec-git-rebase-vos-arbres-poussent-droit-fr.html" rel="alternate"></link><updated>2011-09-16T17:37:00+02:00</updated><author><name>Mathieu Leplatre</name></author><id>tag:blog.mathieu-leplatre.info,2011-09-16:avec-git-rebase-vos-arbres-poussent-droit-fr.html</id><summary type="html">&lt;div class="section" id="le-probleme"&gt;
+&lt;h2&gt;Le problème&lt;/h2&gt;
+&lt;p&gt;Par défaut, un &lt;tt class="docutils literal"&gt;git pull&lt;/tt&gt; est équivalent à &lt;tt class="docutils literal"&gt;git fetch&lt;/tt&gt; et &lt;tt class="docutils literal"&gt;git merge&lt;/tt&gt;.&lt;/p&gt;
+&lt;p&gt;Les &lt;tt class="docutils literal"&gt;merge&lt;/tt&gt;, c'est bien pour les branches, mais pour le tronc, c'est pénible : ça pollue l'historique et
+ça zig-zag sévère !&lt;/p&gt;
+&lt;img alt="" class="align-center" src="/images/git-merge-mess.png" /&gt;
+&lt;/div&gt;
+&lt;div class="section" id="la-solution"&gt;
+&lt;h2&gt;La solution&lt;/h2&gt;
+&lt;p&gt;En réalité, quand on travaille sur le tronc, ce qu'on veut c'est faire &lt;tt class="docutils literal"&gt;git fetch&lt;/tt&gt; et &lt;tt class="docutils literal"&gt;git rebase&lt;/tt&gt;.
+C'est à dire, au lieu de ça :&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+      A-----B-----C master
+     /             \
+D---E---F---G---H---I origin/master
+&lt;/pre&gt;
+&lt;p&gt;on veut ça :&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+                  A---B---C master
+                 /
+D---E---F---G---H origin/master
+&lt;/pre&gt;
+&lt;p&gt;Autrement dit, un &lt;tt class="docutils literal"&gt;git pull &lt;span class="pre"&gt;--rebase&lt;/span&gt;&lt;/tt&gt; ! Pour le faire par défaut :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;git config --global branch.autosetuprebase always
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Et ensuite, au cas-où, pour le désactiver ponctuellement, utiliser &lt;tt class="docutils literal"&gt;git pull &lt;span class="pre"&gt;--no-rebase&lt;/span&gt;&lt;/tt&gt;.&lt;/p&gt;
+&lt;p&gt;Maintenant, le tronc, il est tout propre !&lt;/p&gt;
+&lt;img alt="" class="align-center" src="/images/git-merge-clean.png" /&gt;
+&lt;/div&gt;
+&lt;div class="section" id="les-consequences"&gt;
+&lt;h2&gt;Les conséquences ?&lt;/h2&gt;
+&lt;p&gt;Lors d'un &lt;tt class="docutils literal"&gt;git pull&lt;/tt&gt;, il faudra résoudre chaque &lt;em&gt;commit&lt;/em&gt; conflictuel indépendamment (perso, je préfère).&lt;/p&gt;
+&lt;p&gt;Les êtres humains voudront utiliser &lt;a class="reference external" href="http://meld.sourceforge.net/"&gt;meld&lt;/a&gt;. Il suffit de l'installer, et lors
+d'un conflit, de lancer &lt;tt class="docutils literal"&gt;git mergetool&lt;/tt&gt;.&lt;/p&gt;
+&lt;p&gt;Une fois que tous les conflits sont résolus, terminer l'opération, avec &lt;tt class="docutils literal"&gt;git rebase &lt;span class="pre"&gt;--continue&lt;/span&gt;&lt;/tt&gt;, et pousser vos prouesses à
+vos amis avec &lt;tt class="docutils literal"&gt;git push&lt;/tt&gt;.&lt;/p&gt;
+&lt;/div&gt;
+</summary><category term="git"></category><category term="tips"></category></entry><entry><title>Le piège des QThread</title><link href="http://blog.mathieu-leplatre.info/le-piege-des-qthread-fr.html" rel="alternate"></link><updated>2011-09-01T11:09:00+02:00</updated><author><name>Mathieu Leplatre</name></author><id>tag:blog.mathieu-leplatre.info,2011-09-01:le-piege-des-qthread-fr.html</id><summary type="html">&lt;p&gt;&lt;em&gt;Article original publié chez&lt;/em&gt; &lt;a class="reference external" href="http://www.makina-corpus.org/blog/le-pi%C3%A8ge-des-qthread"&gt;Makina Corpus&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Il y a de nombreux billets de blogs, posts sur des forums, tutoriaux,
+pages Wiki et autres, mais au final, à part le fameux &lt;a class="reference external" href="http://labs.qt.nokia.com/2010/06/17/youre-doing-it-wrong/"&gt;&amp;quot;You're doing it wrong&amp;quot;&lt;/a&gt;,
+qui peut paraître obscure au premier abord, je n'ai pas trouvé de résumé
+de l'attrape-nigaud que je vais illustrer ici.&lt;/p&gt;
+&lt;div class="section" id="le-piege"&gt;
+&lt;h2&gt;Le piège&lt;/h2&gt;
+&lt;p&gt;Naturellement, quand on veut faire une thread, on a envie d'hériter de l'objet
+&lt;a class="reference external" href="http://doc.qt.nokia.com/latest/qthread.html"&gt;QThread&lt;/a&gt;. C'est ce qu'on fait avec le module &lt;tt class="docutils literal"&gt;threading&lt;/tt&gt; de python (en Java aussi il me semble).&lt;/p&gt;
+&lt;p&gt;Voici ce qu'on écrit naturellement : &lt;tt class="docutils literal"&gt;Objet&lt;/tt&gt;, la classe qui file l'ordre et &lt;tt class="docutils literal"&gt;Worker&lt;/tt&gt;, une classe qui bosse dur en arrière plan. On connecte les signaux et on démarre !&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;sys&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;PyQt4.QtCore&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;PyQt4.QtGui&lt;/span&gt;  &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;QApplication&lt;/span&gt;
+
+&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Object&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;QObject&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;emitSignal&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;emit&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;SIGNAL&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;aSignal()&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+
+&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Worker&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;QThread&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;aSlot&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;thread&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sleep&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Slot is executed in thread : &amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;thread&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;currentThreadId&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;__name__&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;__main__&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+    &lt;span class="n"&gt;app&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;QApplication&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;sys&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;argv&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Main application thread is : &amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;app&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;thread&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;currentThreadId&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+
+    &lt;span class="n"&gt;worker&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;Worker&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+    &lt;span class="n"&gt;obj&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;Object&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+    &lt;span class="n"&gt;QObject&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;connect&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;obj&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;SIGNAL&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;aSignal()&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;worker&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;aSlot&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+    &lt;span class="n"&gt;worker&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;start&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+    &lt;span class="n"&gt;obj&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;emitSignal&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Done.&amp;quot;&lt;/span&gt;
+    &lt;span class="n"&gt;app&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;exec_&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Ici, comme le slot &lt;tt class="docutils literal"&gt;aSlot()&lt;/tt&gt; est défini dans la classe &lt;tt class="docutils literal"&gt;Worker&lt;/tt&gt;, qui hérite de &lt;tt class="docutils literal"&gt;QThread&lt;/tt&gt;, on
+pense naturellement qu'il va être exécuté en arrière-plan. Que nenni!&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;Main application thread is :  140068661352224
+&lt;span class="c"&gt;# (... wait 1 sec ...)&lt;/span&gt;
+Slot is executed in thread :  140068661352224
+Done.
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="la-solution"&gt;
+&lt;h2&gt;La solution&lt;/h2&gt;
+&lt;p&gt;Un secret ? Les &lt;tt class="docutils literal"&gt;QThread&lt;/tt&gt; ne sont pas des threads. Elles enrobent l'execution d'une thread.&lt;/p&gt;
+&lt;p&gt;L'appartenance (affinité) d'un objet à une thread détermine le &lt;a class="reference external" href="http://doc.qt.nokia.com/latest/qt.html#ConnectionType-enum"&gt;type de connexion&lt;/a&gt; &lt;a class="reference external" href="http://doc.qt.nokia.com/latest/threads-qobject.html#signals-and-slots-across-threads"&gt;utilisé par défaut&lt;/a&gt;, et par conséquent le comportement lors de l'execution des slots.&lt;/p&gt;
+&lt;p&gt;Ce qu'il faut écrire : &lt;tt class="docutils literal"&gt;Worker&lt;/tt&gt; n'est plus une &lt;tt class="docutils literal"&gt;QThread&lt;/tt&gt;, on force son affinité dans une thread avec &lt;tt class="docutils literal"&gt;moveToThread()&lt;/tt&gt;.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Object&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;QObject&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;emitSignal&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;emit&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;SIGNAL&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;aSignal()&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+
+&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Worker&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;QObject&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;aSlot&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;thread&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sleep&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Slot is executed in thread : &amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;thread&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;currentThreadId&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;__name__&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;__main__&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+    &lt;span class="n"&gt;app&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;QApplication&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;sys&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;argv&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Main application thread is : &amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;app&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;thread&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;currentThreadId&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+
+    &lt;span class="n"&gt;worker&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;Worker&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+    &lt;span class="n"&gt;obj&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;Object&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+
+    &lt;span class="n"&gt;thread&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;QThread&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+    &lt;span class="n"&gt;worker&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;moveToThread&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;thread&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;QObject&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;connect&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;obj&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;SIGNAL&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;aSignal()&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;worker&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;aSlot&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+    &lt;span class="n"&gt;thread&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;start&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+    &lt;span class="n"&gt;obj&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;emitSignal&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Done.&amp;quot;&lt;/span&gt;
+    &lt;span class="n"&gt;app&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;exec_&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Désormais, l'exécution est bien asynchrone, comme on le souhaitait.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;Main application thread is :  139961882056480
+Done.
+&lt;span class="c"&gt;# (... wait 1 sec ...)&lt;/span&gt;
+Slot is executed in thread :  139961512900352
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Tout simplement ! Si j'avais lu mon article avant, je n'aurais pas perdu autant de temps à lire toutes ces docs ambiguës sur le Net.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Sources&lt;/strong&gt;:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference external" href="http://developer.qt.nokia.com/wiki/Threads_Events_QObjects"&gt;Explications complètes&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference external" href="http://doc.qt.nokia.com/4.7-snapshot/thread-basics.html"&gt;Thread Basics&lt;/a&gt; &lt;em&gt;(attention au piège)&lt;/em&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+</summary><category term="qt"></category><category term="python"></category><category term="tips"></category></entry><entry><title>Django, gestion des settings d'application simplifiée</title><link href="http://blog.mathieu-leplatre.info/django-gestion-des-settings-dapplication-simplifiee-fr.html" rel="alternate"></link><updated>2011-07-29T18:30:00+02:00</updated><author><name>Mathieu Leplatre</name></author><id>tag:blog.mathieu-leplatre.info,2011-07-29:django-gestion-des-settings-dapplication-simplifiee-fr.html</id><summary type="html">&lt;p&gt;Je reprends ici la méthode présentée par &lt;a class="reference external" href="http://blog.akei.com/post/4575980188/une-autre-facon-de-gerer-ses-settings-dapplication"&gt;Nicolas&lt;/a&gt; et je la couple avec mon petit &lt;a class="reference external" href="https://github.com/makinacorpus/easydict"&gt;EasyDict&lt;/a&gt; pour alléger l'utilisation !
+Comme ses snippets sont drôles, je ne les change pas !&lt;/p&gt;
+&lt;div class="section" id="parametres-par-default-de-l-application"&gt;
+&lt;h2&gt;Paramètres par défault de l'application&lt;/h2&gt;
+&lt;p&gt;On a juste un constructeur à ajouter par rapport à ce qu'avait présenté NiKo (avec &lt;a class="reference external" href="http://pypi.python.org/pypi/easydict/"&gt;EasyDict installé&lt;/a&gt;).&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;# apps/my_app/__init__.py&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;django.conf&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;settings&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;easydict&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;EasyDict&lt;/span&gt;
+
+&lt;span class="n"&gt;app_settings&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;EasyDict&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;dict&lt;/span&gt;&lt;span class="p"&gt;({&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;#39;FOO&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;42&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;#39;ENABLE_CHUCK_NORRIZ_MODE&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="bp"&gt;False&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="p"&gt;},&lt;/span&gt; &lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="nb"&gt;getattr&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;settings&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;MY_APP_CONFIG&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;{})))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="surcharge-dans-le-projet"&gt;
+&lt;h2&gt;Surcharge dans le projet&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;# settings.py&lt;/span&gt;
+&lt;span class="n"&gt;MY_APP_CONFIG&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;#39;ENABLE_CHUCK_NORRIZ_MODE&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="bp"&gt;True&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="utilisation"&gt;
+&lt;h2&gt;Utilisation !&lt;/h2&gt;
+&lt;p&gt;EasyDict transforme les clés du &lt;cite&gt;dict&lt;/cite&gt; en attributs, on accède aux settings en toute simplicité !&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;# foo/bar.py&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;my_app&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;app_settings&lt;/span&gt;
+
+&lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="n"&gt;app_settings&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;FOO&lt;/span&gt; &lt;span class="c"&gt;# 42&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;# apps/my_app/utils.py&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;.&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;app_settings&lt;/span&gt;
+
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;app_settings&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;ENABLE_CHUCK_NORRIZ_MODE&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;Chuck Norriz is watching you&amp;#39;&lt;/span&gt;
+&lt;span class="k"&gt;else&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;Dance dance, little lamb&amp;#39;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+</summary><category term="django"></category><category term="easydict"></category></entry><entry><title>Carte des vélos avec Leaflet</title><link href="http://blog.mathieu-leplatre.info/carte-des-velos-avec-leaflet-fr.html" rel="alternate"></link><updated>2011-05-30T15:25:00+02:00</updated><author><name>Mathieu Leplatre</name></author><id>tag:blog.mathieu-leplatre.info,2011-05-30:carte-des-velos-avec-leaflet-fr.html</id><summary type="html">&lt;p&gt;&lt;em&gt;Article original publié chez&lt;/em&gt; &lt;a class="reference external" href="http://makina-corpus.org"&gt;Makina Corpus&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Les bookmarks, un peu comme les cahiers de recettes, c'est bien de les remplir mais encore faut-il trouver les bons au moment adéquate !
+Même quand il s'agit d'outils, de bibliothèques et de services Web, il faut trouver l'occasion de les tester avant le grand soir !
+Et si on veut en faire un article de blog, alors là, il faut en plus donner envie d'y goûter :)&lt;/p&gt;
+&lt;p&gt;Ici, je prends plein d'ingrédients trouvés au bord des chemins :&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference external" href="http://packages.python.org/pyquery/"&gt;pyquery&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference external" href="http://leaflet.cloudmade.com"&gt;leaflet&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference external" href="http://developer.yahoo.com/yql/"&gt;Yahoo Query Language&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference external" href="http://mustache.github.com/"&gt;mustache&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Je secoue bien fort ! (sans oublier de saupoudrer de &lt;a class="reference external" href="http://jquery.com"&gt;jquery&lt;/a&gt;) et j'obtiens une carte interactive des stations vélos de Toulouse !&lt;/p&gt;
+&lt;div class="section" id="la-liste-des-stations"&gt;
+&lt;h2&gt;La liste des stations&lt;/h2&gt;
+&lt;p&gt;Sur le site &lt;a class="reference external" href="http://velonow.info"&gt;http://velonow.info&lt;/a&gt;, je récupère un fichier XML qui contient
+la liste statique des stations de vélo et leurs identifiants.&lt;/p&gt;
+&lt;p&gt;C'est l'occasion d'utiliser &lt;a class="reference external" href="http://packages.python.org/pyquery/"&gt;pyquery&lt;/a&gt; pour le transformer en GeoJSON. &lt;a class="reference external" href="http://www.gawel.org"&gt;Gawel&lt;/a&gt; nous l'avait présenté aux djangocongs, il s'agit du portage de l'API de JQuery en python !&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;pyquery&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;PyQuery&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="n"&gt;pq&lt;/span&gt;
+
+&lt;span class="n"&gt;d&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;pq&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;http://server.com/file.xml&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;m&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="nb"&gt;map&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;lambda&lt;/span&gt; &lt;span class="n"&gt;e&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;pq&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;e&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;d&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;find&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;marker&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)):&lt;/span&gt;
+    &lt;span class="n"&gt;pt&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;geojson&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Point&lt;/span&gt;&lt;span class="p"&gt;([&lt;/span&gt;&lt;span class="n"&gt;m&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;attr&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;lng&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+                        &lt;span class="n"&gt;m&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;attr&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;lat&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)])&lt;/span&gt;
+    &lt;span class="o"&gt;...&lt;/span&gt;
+    &lt;span class="o"&gt;...&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Je trouve ça génial d'avoir la même syntaxe de manipulation du DOM en python et en javascript ! Et pour faire du webscrapping, c'est top !&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="affichage-de-la-carte"&gt;
+&lt;h2&gt;Affichage de la carte&lt;/h2&gt;
+&lt;p&gt;&lt;a class="reference external" href="http://cloudmade.com"&gt;Cloudmade&lt;/a&gt; a créé &lt;a class="reference external" href="http://leaflet.cloudmade.com"&gt;leaflet&lt;/a&gt; qui rejoint &lt;a class="reference external" href="http://www.tile5.org"&gt;Tile5&lt;/a&gt; et &lt;a class="reference external" href="http://polymaps.org"&gt;Polymaps&lt;/a&gt; en tant que challenger d'Openlayers !&lt;/p&gt;
+&lt;p&gt;C'est une bibliothèque légère, jolie, fluide, optimisée pour les mobiles,
+et même compatible Internet Explorer !&lt;/p&gt;
+&lt;p&gt;Pour afficher une carte centrée sur la localisation du visiteur de la page, il suffit de faire ça :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;map&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="nx"&gt;L&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Map&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;map&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+&lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;cloudmadeUrl&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="nx"&gt;cloudmade&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="nx"&gt;L&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;TileLayer&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;cloudmadeUrl&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+&lt;span class="nx"&gt;map&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;addLayer&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;cloudmade&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+&lt;span class="nx"&gt;map&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;locateAndSetView&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Pour l'instant, Leaflet ne gère pas les couches au format GeoJSON, en
+attendant &lt;a class="reference external" href="https://github.com/CloudMade/Leaflet/issues/13"&gt;la prochaine release&lt;/a&gt;,
+nous allons ajouter les points des stations en 2 coups de cuillère à pot :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nx"&gt;$&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;getJSON&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;url&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kd"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;data&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="nx"&gt;$&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;each&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;data&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;features&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kd"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;i&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;f&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;cc&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;f&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;geometry&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;coordinates&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+        &lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;marker&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="nx"&gt;L&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Marker&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="nx"&gt;L&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;LatLng&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;cc&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt; &lt;span class="nx"&gt;cc&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]));&lt;/span&gt;
+        &lt;span class="nx"&gt;map&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;addLayer&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;marker&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="p"&gt;});&lt;/span&gt;
+&lt;span class="p"&gt;});&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="details-d-une-station-en-popup"&gt;
+&lt;h2&gt;Détails d'une station en popup&lt;/h2&gt;
+&lt;p&gt;Les détails d'une station (nombre de vélos, emplacements, libres, occupés) sont disponibles en fournissant un identifiant sur le site de &lt;a class="reference external" href="http://www.velo.toulouse.fr"&gt;velo toulouse&lt;/a&gt;.
+Mais lorsqu'on appelle la page en Ajax, le corps de la réponse XML est vide. Une protection contre la bidouillabilité sûrement.&lt;/p&gt;
+&lt;p&gt;C'est là que &lt;a class="reference external" href="http://developer.yahoo.com/yql/"&gt;Yahoo Query Language&lt;/a&gt; nous aide ! On passe par Yahoo pour accèder aux ressources du Web avec &lt;a class="reference external" href="http://developer.yahoo.com/yql/console/"&gt;des requêtes similaires aux bases de données&lt;/a&gt; !&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;yql&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;select * from xml where url = &amp;#39;&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="nx"&gt;url&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&amp;#39;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+ &lt;span class="nx"&gt;yqlurl&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;http://query.yahooapis.com/v1/public/yql?q=&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="nb"&gt;encodeURIComponent&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;yql&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="nx"&gt;$&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;get&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;yqlurl&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kd"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;data&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="c1"&gt;// show data in pop up !&lt;/span&gt;
+&lt;span class="p"&gt;});&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Je fais une petite fonction pour transformer l'XML récupéré en objet :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kd"&gt;function&lt;/span&gt; &lt;span class="nx"&gt;xml2obj&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;xmldata&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="nx"&gt;d&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{};&lt;/span&gt;
+    &lt;span class="nx"&gt;$&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;xmldata&lt;/span&gt;&lt;span class="p"&gt;).&lt;/span&gt;&lt;span class="nx"&gt;children&lt;/span&gt;&lt;span class="p"&gt;().&lt;/span&gt;&lt;span class="nx"&gt;each&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kd"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;index&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;value&lt;/span&gt;&lt;span class="p"&gt;){&lt;/span&gt;
+        &lt;span class="nx"&gt;d&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nx"&gt;$&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;value&lt;/span&gt;&lt;span class="p"&gt;).&lt;/span&gt;&lt;span class="nx"&gt;get&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;).&lt;/span&gt;&lt;span class="nx"&gt;nodeName&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;$&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;value&lt;/span&gt;&lt;span class="p"&gt;).&lt;/span&gt;&lt;span class="nx"&gt;text&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+    &lt;span class="p"&gt;});&lt;/span&gt;
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nx"&gt;d&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nt"&gt;&amp;lt;station&amp;gt;&lt;/span&gt;
+    &lt;span class="nt"&gt;&amp;lt;free&amp;gt;&lt;/span&gt;12&lt;span class="nt"&gt;&amp;lt;/free&amp;gt;&lt;/span&gt;
+    &lt;span class="nt"&gt;&amp;lt;available&amp;gt;&lt;/span&gt;4&lt;span class="nt"&gt;&amp;lt;/available&amp;gt;&lt;/span&gt;
+    &lt;span class="nt"&gt;&amp;lt;total&amp;gt;&lt;/span&gt;16&lt;span class="nt"&gt;&amp;lt;/total&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;/station&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;devient :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="nx"&gt;free&lt;/span&gt; &lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;12&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="nx"&gt;available&lt;/span&gt; &lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="nx"&gt;total&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;16&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Pour mettre en forme ces informations dans la pop-up, nous allons utiliser &lt;a class="reference external" href="http://mustache.github.com/"&gt;mustache&lt;/a&gt; !
+Conceptuellement, il s'agit tout simplement d'un moteur de template avec &lt;a class="reference external" href="http://mustache.github.com/mustache.5.html"&gt;une syntaxe simplifiée&lt;/a&gt; ! Il y a une implémentation
+dans quasiment tous les languages, dont Javascript.&lt;/p&gt;
+&lt;p&gt;Cela évite principalement de faire du code javascript pour la mise en forme des données, notamment pour
+celles récupérées en JSON via Ajax.&lt;/p&gt;
+&lt;p&gt;On construit une chaîne avec les fameuses &lt;cite&gt;{{}}&lt;/cite&gt; et on fournit un objet pour substituer les valeurs :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;data&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;xml2obj&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;$&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;xmldata&lt;/span&gt;&lt;span class="p"&gt;).&lt;/span&gt;&lt;span class="nx"&gt;find&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;station&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)),&lt;/span&gt;
+    &lt;span class="nx"&gt;template&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&amp;lt;h2&amp;gt;Station #{{ number }}&amp;lt;/h2&amp;gt;&lt;/span&gt;
+&lt;span class="s2"&gt;                &amp;lt;p&amp;gt;{{ address }}&amp;lt;/p&amp;gt;                    \&lt;/span&gt;
+&lt;span class="s2"&gt;                {{# station }}                          \&lt;/span&gt;
+&lt;span class="s2"&gt;                &amp;lt;ul&amp;gt;                                    \&lt;/span&gt;
+&lt;span class="s2"&gt;                  &amp;lt;li&amp;gt;{{ available }} available&amp;lt;/li&amp;gt;    \&lt;/span&gt;
+&lt;span class="s2"&gt;                  &amp;lt;li&amp;gt;{{ free }} free slots&amp;lt;/li&amp;gt;        \&lt;/span&gt;
+&lt;span class="s2"&gt;                &amp;lt;/ul&amp;gt;                                   \&lt;/span&gt;
+&lt;span class="s2"&gt;                {{/ station }}&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="nx"&gt;content&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;Mustache&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;to_html&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;template&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;data&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+&lt;span class="c1"&gt;// Show marker popup !&lt;/span&gt;
+&lt;span class="nx"&gt;marker&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;bindPopup&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;content&lt;/span&gt;&lt;span class="p"&gt;).&lt;/span&gt;&lt;span class="nx"&gt;openPopup&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Et voilà !&lt;/p&gt;
+&lt;img alt="" src="/images/leaflet-velo.png" /&gt;
+&lt;/div&gt;
+</summary><category term="javascript"></category><category term="leaflet"></category><category term="mustache"></category><category term="pyquery"></category><category term="jquery"></category></entry><entry><title>URL reverse en Javascript avec django</title><link href="http://blog.mathieu-leplatre.info/url-reverse-en-javascript-avec-django-fr.html" rel="alternate"></link><updated>2011-05-27T15:25:00+02:00</updated><author><name>Mathieu Leplatre</name></author><id>tag:blog.mathieu-leplatre.info,2011-05-27:url-reverse-en-javascript-avec-django-fr.html</id><summary type="html">&lt;p&gt;&lt;em&gt;Article original publié chez&lt;/em&gt; &lt;a class="reference external" href="http://makina-corpus.org"&gt;Makina Corpus&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Un aspect fondamental de la philosophie django consiste à éviter toute sorte de redondance : &lt;a class="reference external" href="https://docs.djangoproject.com/en/dev/misc/design-philosophies/"&gt;Don't Repeat Yourself&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;La tentation est souvent trop belle, et respecter les fondamentaux s'avère parfois difficile ! C'est le cas de la réécriture d'URL en Javascript.&lt;/p&gt;
+&lt;p&gt;Imaginons l'URL suivante définie dans &lt;cite&gt;urls.py&lt;/cite&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;r&amp;#39;^/plop/(?P&amp;lt;x&amp;gt;\d)/(?P&amp;lt;y&amp;gt;\d)$&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;plopview&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;plop&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Pour utiliser cette URL en Javascript avec des paramètres variables, on peut imaginer plusieurs approches.&lt;/p&gt;
+&lt;div class="section" id="j-aime-pas"&gt;
+&lt;h2&gt;J'aime pas&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;generic&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;{% url &amp;#39;plop&amp;#39; 0 0 %}&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="nx"&gt;generic&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;replace&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;0/0&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;x&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;/&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="nx"&gt;y&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Pas DRY ! à cause des &lt;cite&gt;/&lt;/cite&gt;.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="s2"&gt;&amp;quot;{% url &amp;#39;plop&amp;#39; 0 0 %}&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;../../&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="nx"&gt;x&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;/&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="nx"&gt;y&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Pas DRY non plus !&lt;/p&gt;
+&lt;p&gt;On peut aussi changer le pattern pour éviter les &lt;cite&gt;/&lt;/cite&gt;.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;r&amp;#39;^/plop/(?P&amp;lt;x&amp;gt;[\d]|x)/(?P&amp;lt;y&amp;gt;[\d]|y)$&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;plop&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;generic&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;{% url &amp;#39;toto&amp;#39; &amp;#39;x&amp;#39; &amp;#39;y&amp;#39; %}&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="nx"&gt;generic&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;replace&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;x&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;x&lt;/span&gt;&lt;span class="p"&gt;).&lt;/span&gt;&lt;span class="nx"&gt;replace&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;y&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;y&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;C'est mieux, mais pas DRY ! à cause des &lt;cite&gt;x&lt;/cite&gt;, &lt;cite&gt;y&lt;/cite&gt;.&lt;/p&gt;
+&lt;p&gt;On pourrait aussi imaginer une vue django qui ferait le &lt;cite&gt;reverse()&lt;/cite&gt;. Mais cela multiplierait les aller-retours serveur, ce qui n'est pas toujours recommandé...&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="la-bonne"&gt;
+&lt;h2&gt;La bonne&lt;/h2&gt;
+&lt;p&gt;Il existe une application pour ça ! &lt;a class="reference external" href="https://github.com/Dimitri-Gnidash/django-js-utils"&gt;django-js-utils&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Elle se charge de générer un fichier Javascript (&lt;cite&gt;settings.URLS_JS_GENERATED_FILE&lt;/cite&gt;) grâce à une commande de gestion&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+python manage.js js_urls
+&lt;/pre&gt;
+&lt;p&gt;Ensuite on utilise explicitement le fichier généré&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nt"&gt;&amp;lt;script &lt;/span&gt;&lt;span class="na"&gt;type=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;text/javascript&amp;quot;&lt;/span&gt; &lt;span class="na"&gt;src=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;{{ MEDIA_URL }}/js/dutils.js&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&amp;lt;/script&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;script &lt;/span&gt;&lt;span class="na"&gt;type=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;text/javascript&amp;quot;&lt;/span&gt; &lt;span class="na"&gt;src=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;{{ MEDIA_URL }}/js/dutils.conf.urls.js&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&amp;lt;/script&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Et on fait du vrai DRY !&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nx"&gt;dutils&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;urls&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;resolve&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;plop&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;x&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="nx"&gt;x&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;y&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="nx"&gt;y&lt;/span&gt; &lt;span class="p"&gt;})&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Gagné ! \o/&lt;/p&gt;
+&lt;p&gt;Un inconvénient à noter tout de même : la liste de l'ensemble des URLs de l'application est accessible au public. Mais j'ai pas mieux ma pauvre dame !&lt;/p&gt;
+&lt;/div&gt;
+</summary><category term="django"></category><category term="javascript"></category></entry><entry><title>Django et Jenkins</title><link href="http://blog.mathieu-leplatre.info/django-et-jenkins-fr.html" rel="alternate"></link><updated>2011-04-28T17:25:00+02:00</updated><author><name>Mathieu Leplatre</name></author><id>tag:blog.mathieu-leplatre.info,2011-04-28:django-et-jenkins-fr.html</id><summary type="html">&lt;p&gt;&lt;em&gt;Article original publié chez&lt;/em&gt; &lt;a class="reference external" href="http://makina-corpus.org"&gt;Makina Corpus&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Lors des &lt;a class="reference external" href="http://rencontres.django-fr.org/2011/"&gt;Recontres Django 2011&lt;/a&gt;, &lt;a class="reference external" href="http://www.akei.com"&gt;Nicolas Perriault&lt;/a&gt; a présenté les principes de l'&lt;a class="reference external" href="http://fr.wikipedia.org/wiki/Int%C3%A9gration_continue"&gt;intégration continue&lt;/a&gt; avec &lt;a class="reference external" href="http://djangoproject.com"&gt;Django&lt;/a&gt; et &lt;a class="reference external" href="http://jenkins-ci.org/"&gt;Jenkins&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Le diaporama, &lt;a class="reference external" href="http://www.akei.com/presentations/2011-Djangocong/index.html"&gt;disponible en ligne&lt;/a&gt;, suffit amplement pour démarrer !&lt;/p&gt;
+&lt;p&gt;Mais pour qu'un projet django soit testé facilement, il doit se déployer et se lancer facilement ! C'est certes l'occasion de peaufiner l'automatisation, mais c'est loin d'être trivial quand il y a du SIG, du &lt;a class="reference external" href="http://celeryproject.org"&gt;celery&lt;/a&gt; ...
+Je vais tenter de partager mes notes dans ce billet.&lt;/p&gt;
+&lt;div class="section" id="le-minimum-requis"&gt;
+&lt;h2&gt;Le minimum requis&lt;/h2&gt;
+&lt;p&gt;Pour l'installation de Jenkins, rien de plus simple (&lt;em&gt;sur debian&lt;/em&gt;)&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+sudo aptitude install jenkins
+&lt;/pre&gt;
+&lt;p&gt;Mais il va falloir lui donner de quoi télécharger votre code sur &lt;cite&gt;git&lt;/cite&gt; et parfois compiler les librairies python nécessaires&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+sudo aptitude install git-core
+sudo aptitude install python-dev build-essential python-virtualenv
+&lt;/pre&gt;
+&lt;p&gt;Les plugins indispensables :&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;covertura&lt;/li&gt;
+&lt;li&gt;Violations&lt;/li&gt;
+&lt;li&gt;GIT&lt;/li&gt;
+&lt;li&gt;Green Balls&lt;/li&gt;
+&lt;li&gt;Continuous Integration Game&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="organisation-du-projet-django"&gt;
+&lt;h2&gt;Organisation du projet Django&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;p class="first"&gt;Définition des dépendances globales dans &lt;cite&gt;requirements.txt&lt;/cite&gt;&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+Django&amp;gt;=1.3
+south
+&lt;/pre&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p class="first"&gt;Définition des dépendances liées aux tests dans &lt;cite&gt;requirements-testing.txt&lt;/cite&gt;&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+django-jenkins
+&lt;/pre&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p class="first"&gt;Ajout d'un fichier &lt;cite&gt;pylint.rc&lt;/cite&gt; pour régler les niveaux d'alerte &lt;a class="reference external" href="http://www.python.org/dev/peps/pep-0008/"&gt;PEP-8&lt;/a&gt;&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+[MESSAGES CONTROL]
+disable=E1101,E1103,C0111,I0011,I0012,W0704,W0142,W0212,W0232,W0613,W0702,R0201
+...
+...
+&lt;/pre&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p class="first"&gt;Modèle de settings de tests dans &lt;cite&gt;project/test_settings.py&lt;/cite&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;default_settings&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;
+&lt;span class="n"&gt;DEBUG&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;True&lt;/span&gt;
+&lt;span class="n"&gt;TEMPLATE_DEBUG&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;DEBUG&lt;/span&gt;
+
+&lt;span class="n"&gt;INSTALLED_APPS&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;#39;django_jenkins&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;PYLINT_RCFILE&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;os&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;path&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;join&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;PROJECT_ROOT_PATH&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;..&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;conf&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;pylint.rc&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="configuration-du-job-jenkins"&gt;
+&lt;h2&gt;Configuration du job Jenkins&lt;/h2&gt;
+&lt;p&gt;Les informations de la présentation de Nicolas suffisent pour démarrer.&lt;/p&gt;
+&lt;p&gt;J'ai noté cependant qu'il fallait lancer &lt;cite&gt;manage.py&lt;/cite&gt; depuis un répertoire parent au projet pour que l'exploration du code source fonctionne.&lt;/p&gt;
+&lt;p&gt;Pour profiter de la magie des ingrédients précédents, nous aurons donc juste à ajouter un bloc script shell, qui installe les dépendances listées, pose les settings de test et migre la base (avec &lt;a class="reference external" href="http://south.aeracode.org"&gt;South&lt;/a&gt;):&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;#!/bin/bash -ex&lt;/span&gt;
+virtualenv --quiet ve
+&lt;span class="nb"&gt;source&lt;/span&gt; ./ve/bin/activate
+pip install -E ./ve -r &lt;span class="nv"&gt;$WORKSPACE&lt;/span&gt;/requirements.txt
+pip install -E ./ve -r &lt;span class="nv"&gt;$WORKSPACE&lt;/span&gt;/requirements-testing.txt
+cp &lt;span class="nv"&gt;$WORKSPACE&lt;/span&gt;/project/test_settings.py &lt;span class="nv"&gt;$WORKSPACE&lt;/span&gt;/project/local_settings.py
+python &lt;span class="nv"&gt;$WORKSPACE&lt;/span&gt;/project/manage.py syncdb --noinput
+python &lt;span class="nv"&gt;$WORKSPACE&lt;/span&gt;/project/manage.py migrate
+deactivate
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;et celui-ci pour lancer les tests proprements dits :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;#!/bin/bash -ex&lt;/span&gt;
+virtualenv --quiet ve
+&lt;span class="nb"&gt;source&lt;/span&gt; ./ve/bin/activate
+python &lt;span class="nv"&gt;$WORKSPACE&lt;/span&gt;/project/manage.py jenkins yourapps
+deactivate
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="pour-un-projet-sig"&gt;
+&lt;h2&gt;Pour un projet SIG&lt;/h2&gt;
+&lt;p&gt;Il faut installer certaines librairies SIG sur le serveur Jenkins.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;sudo aptitude install libproj0 libgeos-c1
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Si le besoin de cloisonner ces librairies pour chaque projet se fait ressentir, il faut utiliser des outils comme &lt;a class="reference external" href="http://www.minitage.org"&gt;minitage&lt;/a&gt;.&lt;/p&gt;
+&lt;div class="section" id="spatialite-au-lieu-de-postgis-comme-base-de-tests"&gt;
+&lt;h3&gt;Spatialite au lieu de PostGIS comme base de tests&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;sudo aptitude install python-sqlite libspatialite2 sqlite3
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Script d'initialisation&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;wget http://www.gaia-gis.it/spatialite/init_spatialite-2.3.zip -O /tmp/init_spatialite-2.3.zip
+&lt;span class="nb"&gt;cd&lt;/span&gt; /usr/local/lib/
+sudo unzip /tmp/init_spatialite-2.3.zip
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;avec dans &lt;cite&gt;test_settings.py&lt;/cite&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;DATABASES&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="s"&gt;&amp;#39;default&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;#39;ENGINE&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;django.contrib.gis.db.backends.spatialite&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="o"&gt;...&lt;/span&gt;
+    &lt;span class="o"&gt;...&lt;/span&gt;
+
+&lt;span class="n"&gt;SPATIALITE_SQL&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;os&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;path&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;join&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;usr&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;local&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;lib&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;init_spatialite-2.3.sql&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Si pysqlite n'a pas été compilé avec les extensions C (Erreur: &lt;em&gt;The pysqlite library does not support C extension loading.&lt;/em&gt;) il va falloir le recompiler !&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;sudo aptitude install libsqlite3-dev
+wget http://pysqlite.googlecode.com/files/pysqlite-2.6.3.tar.gz
+tar -zxvf pysqlite-2.6.3.tar.gz
+&lt;span class="nb"&gt;cd &lt;/span&gt;pysqlite-2.6.3
+sed -i s/define&lt;span class="o"&gt;=&lt;/span&gt;SQLITE_OMIT_LOAD_EXTENSION/#define&lt;span class="o"&gt;=&lt;/span&gt;SQLITE_OMIT_LOAD_EXTENSION/g setup.cfg
+
+&lt;span class="nb"&gt;source&lt;/span&gt; ./ve/bin/activate
+python setup.py install
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="pour-un-projet-celery"&gt;
+&lt;h2&gt;Pour un projet Celery&lt;/h2&gt;
+&lt;div class="section" id="kombu-au-lieu-de-rabbitmq-comme-gestionnaire-de-messages"&gt;
+&lt;h3&gt;Kombu au lieu de RabbitMQ comme gestionnaire de messages&lt;/h3&gt;
+&lt;p&gt;&lt;cite&gt;requirements-testing.txt&lt;/cite&gt;&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+kombu
+djkombu
+&lt;/pre&gt;
+&lt;p&gt;&lt;cite&gt;test_settings.py&lt;/cite&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;INSTALLED_APPS&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;#39;djkombu&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;CARROT_BACKEND&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;django&amp;quot;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Pour désactiver la parallélisation lors des tests&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;CELERY_ALWAYS_EAGER&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;True&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</summary><category term="django"></category><category term="jenkins"></category><category term="continuous integration"></category><category term=""></category></entry><entry><title>landez : fabriquer facilement des fichiers MBTiles en python</title><link href="http://blog.mathieu-leplatre.info/landez-fabriquer-facilement-des-fichiers-mbtiles-en-python-fr.html" rel="alternate"></link><updated>2011-04-21T12:04:00+02:00</updated><author><name>Mathieu Leplatre</name></author><id>tag:blog.mathieu-leplatre.info,2011-04-21:landez-fabriquer-facilement-des-fichiers-mbtiles-en-python-fr.html</id><summary type="html">&lt;p&gt;&lt;a class="reference external" href="http://www.makina-corpus.org/blog/integration-mbtiles-format-android"&gt;Une nouvelle fois&lt;/a&gt;,
+Makina Corpus se rapproche du projet &lt;a class="reference external" href="http://mapbox.com/"&gt;MapBox&lt;/a&gt;, avec une contribution
+sur la librairie &lt;a class="reference external" href="https://github.com/mapbox/mbutil/contributors"&gt;mbutil&lt;/a&gt;, qui permet de fabriquer des fichiers MBTiles.&lt;/p&gt;
+&lt;p&gt;Nous l'utilisons dans &lt;a class="reference external" href="https://github.com/makinacorpus/landez"&gt;landez&lt;/a&gt;, un outil qui permet
+de créer des fichiers MBTiles à partir de sites de tuiles externes ou de feuilles de styles Mapnik.&lt;/p&gt;
+&lt;p&gt;Son utilisation est fort simple !&lt;/p&gt;
+&lt;p&gt;Pour un service de tuiles externe :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;landez&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;MBTilesBuilder&lt;/span&gt;
+
+&lt;span class="c"&gt;# downloads from Cloudmade by default, be careful with terms of usage  !&lt;/span&gt;
+&lt;span class="n"&gt;mb&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;MBTilesBuilder&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;remote&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="bp"&gt;True&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;filepath&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;dest.mbtiles&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;mb&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;add_coverage&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;bbox&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mf"&gt;90.0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mf"&gt;180.0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mf"&gt;180.0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mf"&gt;90.0&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+                &lt;span class="n"&gt;zoomlevels&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;
+&lt;span class="n"&gt;mb&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;run&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Avec une feuille de style locale :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;landez&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;MBTilesBuilder&lt;/span&gt;
+
+&lt;span class="n"&gt;mb&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;MBTilesBuilder&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;stylefile&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;yourstyle.xml&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;filepath&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;dest.mbtiles&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;mb&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;add_coverage&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;bbox&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mf"&gt;90.0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mf"&gt;180.0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mf"&gt;180.0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mf"&gt;90.0&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+                &lt;span class="n"&gt;zoomlevels&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;
+&lt;span class="n"&gt;mb&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;run&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Une branche experimentale a été initiée pour travailler sur le multiprocessing
+afin de paralléliser au maximum la fabrication des tuiles en amont. Si cela vous intéresse, soyez les bienvenus !&lt;/p&gt;
+</summary><category term="python"></category><category term="mapbox"></category><category term="gis"></category><category term="landez"></category></entry><entry><title>Ajouter un sélecteur de couches (layer switcher) à polymaps</title><link href="http://blog.mathieu-leplatre.info/ajouter-un-selecteur-de-couches-layer-switcher-a-polymaps-fr.html" rel="alternate"></link><updated>2011-03-09T12:03:00+01:00</updated><author><name>Mathieu Leplatre</name></author><id>tag:blog.mathieu-leplatre.info,2011-03-09:ajouter-un-selecteur-de-couches-layer-switcher-a-polymaps-fr.html</id><summary type="html">&lt;p&gt;Je fais partie de ceux qui sont persuadés que &lt;a class="reference external" href="http://polymaps.org/"&gt;polymaps&lt;/a&gt; est tout à fait mature !
+Certes, il ne fournit pas autant de fonctionnalités et de connecteurs qu'OpenLayers,
+mais il ne semble pas que ce soit son objectif ! Il est léger et personnalisable à souhait !&lt;/p&gt;
+&lt;p&gt;Pour le prouver, nous allons créer ici un sélecteur de couches pour polymaps.&lt;/p&gt;
+&lt;p&gt;Javascript n'est pas mon langage de prédilection, encore moins pour faire
+de la programmation orientée objets.&lt;/p&gt;
+&lt;p&gt;Voici ce que j'ai réussi à comprendre de l'héritage et la portée dans le modèle objet de polymaps :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kd"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;po&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="nx"&gt;po&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;classname&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kd"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;args&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+   &lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;self&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{},&lt;/span&gt;      &lt;span class="c1"&gt;// new class or inheritance&lt;/span&gt;
+        &lt;span class="nx"&gt;member&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;         &lt;span class="c1"&gt;// member variable&lt;/span&gt;
+
+    &lt;span class="kd"&gt;function&lt;/span&gt; &lt;span class="nx"&gt;privatemethod&lt;/span&gt; &lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="c1"&gt;// [...]&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+
+    &lt;span class="nx"&gt;self&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;classmethod&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kd"&gt;function&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;args&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="c1"&gt;// [...]&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nx"&gt;self&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;  &lt;span class="c1"&gt;// allows to chain method calls&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nx"&gt;self&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+  &lt;span class="p"&gt;};&lt;/span&gt;
+&lt;span class="p"&gt;})(&lt;/span&gt;&lt;span class="nx"&gt;org&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;polymaps&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Pour faire ce sélecteur de couches, nous aurons besoin d'une classe disposant :&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;de variables membres qui stockent la liste de couches disponibles (&lt;tt class="docutils literal"&gt;layers&lt;/tt&gt;) et la couche actuelle (&lt;tt class="docutils literal"&gt;current&lt;/tt&gt;)&lt;/li&gt;
+&lt;li&gt;d'une méthode de classe qui bascule d'une couche à l'autre&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nx"&gt;self&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;switchto&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kd"&gt;function&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;name&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;l&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;layers&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nx"&gt;name&lt;/span&gt;&lt;span class="p"&gt;];&lt;/span&gt;  &lt;span class="c1"&gt;// find layer by name&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;l&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;map&lt;/span&gt;&lt;span class="p"&gt;())&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+       &lt;span class="nx"&gt;l&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;visible&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kc"&gt;true&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;   &lt;span class="c1"&gt;// if already loaded, make it visible&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+    &lt;span class="k"&gt;else&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="nx"&gt;map&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;add&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;l&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;        &lt;span class="c1"&gt;// else load it&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;current&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="nx"&gt;current&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;visible&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kc"&gt;false&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;  &lt;span class="c1"&gt;// hide current&lt;/span&gt;
+    &lt;span class="nx"&gt;current&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;l&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;d'une méthode qui crée l'interface avec les radio buttons et qui les relie à la méthode précedente&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nx"&gt;self&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;container&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kd"&gt;function&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;elt&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;list&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;document&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;createElement&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;div&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="c1"&gt;// [...]&lt;/span&gt;
+    &lt;span class="c1"&gt;// For each layer, create a &amp;lt;input&amp;gt;&lt;/span&gt;
+    &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;name&lt;/span&gt; &lt;span class="k"&gt;in&lt;/span&gt; &lt;span class="nx"&gt;layers&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;input&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;document&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;createElement&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;input&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+        &lt;span class="nx"&gt;input&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;setAttribute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;type&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;radio&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+        &lt;span class="nx"&gt;input&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;setAttribute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;value&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;name&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+        &lt;span class="c1"&gt;// [...]&lt;/span&gt;
+        &lt;span class="c1"&gt;// Link onChange event on radio&lt;/span&gt;
+        &lt;span class="nx"&gt;input&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;onchange&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kd"&gt;function&lt;/span&gt; &lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+            &lt;span class="nx"&gt;self&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;switchto&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;getAttribute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;value&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;
+        &lt;span class="p"&gt;};&lt;/span&gt;
+        &lt;span class="c1"&gt;// [...]&lt;/span&gt;
+        &lt;span class="nx"&gt;list&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;appendChild&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;input&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+    &lt;span class="c1"&gt;// [...]&lt;/span&gt;
+    &lt;span class="nx"&gt;elt&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;appendChild&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;list&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nx"&gt;self&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Maintenant il suffit de l'utiliser ! Voici un exemple simple avec deux couches :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c1"&gt;// Create a normal map&lt;/span&gt;
+&lt;span class="nx"&gt;map&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;po&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;mcmap&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+        &lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;container&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;document&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;getElementById&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;map&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;).&lt;/span&gt;&lt;span class="nx"&gt;appendChild&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;po&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;svg&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;svg&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)))&lt;/span&gt;
+        &lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;add&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;po&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;interact&lt;/span&gt;&lt;span class="p"&gt;());&lt;/span&gt;
+
+&lt;span class="c1"&gt;// Define the layers&lt;/span&gt;
+&lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;layers&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="s2"&gt;&amp;quot;layer1&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;:&lt;/span&gt;
+    &lt;span class="nx"&gt;po&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;image&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+      &lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;url&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;po&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;url&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;http://server1/{Z}/{X}/{Y}.png&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+      &lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;id&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;l1&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+
+    &lt;span class="s2"&gt;&amp;quot;layer2&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;:&lt;/span&gt;
+    &lt;span class="nx"&gt;po&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;image&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+      &lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;url&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;po&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;url&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;http://server2/{Z}/{X}/{Y}.png&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+      &lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;id&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;l2&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+&lt;span class="p"&gt;};&lt;/span&gt;
+
+&lt;span class="c1"&gt;// Add the default one&lt;/span&gt;
+&lt;span class="nx"&gt;map&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;add&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;layers&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;layer1&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;]);&lt;/span&gt;
+
+&lt;span class="c1"&gt;// Create the switcher&lt;/span&gt;
+&lt;span class="nx"&gt;po&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;switcher&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;map&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;layers&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="nx"&gt;title&lt;/span&gt; &lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;Fond de carte&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;})&lt;/span&gt;
+  &lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;container&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;document&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;getElementById&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;layerswitcher&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Et voilà ! Nous avons notre sélecteur de couches, avec un code html
+tout simple (&lt;tt class="docutils literal"&gt;div&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;input&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;label&lt;/tt&gt;), facile à styler en CSS,
+contrairement au &lt;a class="reference external" href="http://pastebin.com/LQPBv6tZ"&gt;gros pavé généré par le *LayerSwitcher* d'OpenLayers&lt;/a&gt;.&lt;/p&gt;
+&lt;img alt="" src="/images/polymaps-switcher.png" /&gt;
+&lt;p&gt;Pour accéder au code complet et l'améliorer : &amp;quot;&lt;a class="reference external" href="https://github.com/makinacorpus/polymaps-extensions"&gt;Fork me on GitHub&lt;/a&gt;&amp;quot; !&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Article original publié chez&lt;/em&gt; &lt;a class="reference external" href="http://www.makina-corpus.org/blog/ajouter-un-s%C3%A9lecteur-de-couches-layer-switcher-%C3%A0-polymaps"&gt;Makina Corpus&lt;/a&gt;&lt;/p&gt;
+</summary><category term="polymaps"></category><category term="tips"></category><category term="javascript"></category><category term="gis"></category></entry><entry><title>Afficher des pictogrammes avec polymaps</title><link href="http://blog.mathieu-leplatre.info/afficher-des-pictogrammes-avec-polymaps-fr.html" rel="alternate"></link><updated>2011-02-28T17:02:00+01:00</updated><author><name>Mathieu Leplatre</name></author><id>tag:blog.mathieu-leplatre.info,2011-02-28:afficher-des-pictogrammes-avec-polymaps-fr.html</id><summary type="html">&lt;p&gt;En reprenant l'exemple de l'&lt;a class="reference external" href="http://www.makina-corpus.org/blog/afficher-les-donn%C3%A9es-de-paris-opendata-avec-polymaps"&gt;épisode précédent avec polymaps&lt;/a&gt;, nous allons maintenant afficher des pictogrammes sur les points.&lt;/p&gt;
+&lt;p&gt;On conserve la couche GeoJSON en utilisant un &lt;a class="reference external" href="http://fr.wikipedia.org/wiki/Fonction_de_rappel"&gt;callback&lt;/a&gt; pour l'évènement &lt;tt class="docutils literal"&gt;load&lt;/tt&gt;.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nx"&gt;map&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;add&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;po&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;geoJson&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+          &lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;url&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;collecteurs.json&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+          &lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;on&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;load&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;load&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Dans la fonction &lt;tt class="docutils literal"&gt;load()&lt;/tt&gt;, nous allons remplacer les cercles dessinés par défaut par des pictogrammes en manipulant les éléments de la page (&lt;a class="reference external" href="http://fr.wikipedia.org/wiki/Document_Object_Model"&gt;DOM&lt;/a&gt;).
+Nous utilisons ici la variable &lt;tt class="docutils literal"&gt;n$&lt;/tt&gt;, qui provient du miniscript &lt;tt class="docutils literal"&gt;nns.js&lt;/tt&gt; livré dans l'archive &lt;em&gt;polymaps&lt;/em&gt; et qui facilite la manipulation du DOM (le vénérable &lt;a class="reference external" href="http://jquery.com/"&gt;jquery&lt;/a&gt; ferait aussi l'affaire)&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kd"&gt;function&lt;/span&gt; &lt;span class="nx"&gt;load&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;e&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;ICONSIZE&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;16&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="c1"&gt;// Parcourir les features de la carte&lt;/span&gt;
+    &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;i&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="nx"&gt;i&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="nx"&gt;e&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;features&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;length&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="nx"&gt;i&lt;/span&gt;&lt;span class="o"&gt;++&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;circle&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;n$&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;e&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;features&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nx"&gt;i&lt;/span&gt;&lt;span class="p"&gt;].&lt;/span&gt;&lt;span class="nx"&gt;element&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+        &lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;root&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;circle&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;parent&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+        &lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;attributes&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;e&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;features&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nx"&gt;i&lt;/span&gt;&lt;span class="p"&gt;].&lt;/span&gt;&lt;span class="nx"&gt;data&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;properties&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+        &lt;span class="c1"&gt;// Ajouter et positionner le pictogramme&lt;/span&gt;
+        &lt;span class="c1"&gt;// (à partir de la position du cercle)&lt;/span&gt;
+        &lt;span class="nx"&gt;img&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;root&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;add&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;svg:image&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+             &lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;attr&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;width&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;ICONSIZE&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+             &lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;attr&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;height&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;ICONSIZE&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+             &lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;attr&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;transform&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;circle&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;attr&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;transform&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+                            &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39; translate(-&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;ICONSIZE&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;,&amp;#39;&lt;/span&gt;
+                                       &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;-&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;ICONSIZE&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;)&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+        &lt;span class="c1"&gt;// Enlever le cercle original&lt;/span&gt;
+        &lt;span class="nx"&gt;root&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;remove&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;circle&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+        &lt;span class="c1"&gt;// Définir le chemin du pictogramme à utiliser&lt;/span&gt;
+        &lt;span class="c1"&gt;// en fonction de l&amp;#39;attribut&lt;/span&gt;
+        &lt;span class="nx"&gt;img&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;attr&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;xlink:href&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;attributes&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Etat&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;Actif&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;?&lt;/span&gt;
+                               &lt;span class="s1"&gt;&amp;#39;actif.svg&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;inactif.svg&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;img alt="" src="/images/polymaps-pictogrammes.jpg" /&gt;
+&lt;p&gt;&lt;em&gt;© City of Paris, ODBL, CloudMade, OpenStreetMap contributors, CCBYSA&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;Ici, nous avons utilisé des pictogrammes SVG, mais le même code fonctionne avec des /images PNG ou JPG...&lt;/p&gt;
+</summary><category term="javascript"></category><category term="polymaps"></category><category term="gis"></category></entry><entry><title>Afficher les données de Paris OpenData avec polymaps</title><link href="http://blog.mathieu-leplatre.info/afficher-les-donnees-de-paris-opendata-avec-polymaps-fr.html" rel="alternate"></link><updated>2011-02-24T13:02:00+01:00</updated><author><name>Mathieu Leplatre</name></author><id>tag:blog.mathieu-leplatre.info,2011-02-24:afficher-les-donnees-de-paris-opendata-avec-polymaps-fr.html</id><summary type="html">&lt;p&gt;En ouvrant l'accès à un catalogue de données diverses (Équipements, bâti, arbres d'alignement, arrêtés municipaux, ...)
+l'initiative &lt;a class="reference external" href="http://opendata.paris.fr"&gt;ParisData&lt;/a&gt;, l'Open Data de la capitale, nous donne l'occasion de manipuler des données georéférencées.
+Notre objectif ici sera de les publier sur une page Web grâce à un outil simple et léger : &lt;a class="reference external" href="http://polymaps.org"&gt;polymaps&lt;/a&gt;.&lt;/p&gt;
+&lt;div class="section" id="transformation"&gt;
+&lt;h2&gt;Transformation&lt;/h2&gt;
+&lt;p&gt;Le système de projection utilisé pour certaines données du catalogue est la &lt;a class="reference external" href="http://en.wikipedia.org/wiki/Lambert_conformal_conic_projection"&gt;Lambert Conformal Conic&lt;/a&gt; (NTF, EPSG 9802)&lt;/p&gt;
+&lt;p&gt;Dans la mesure où nous voulons déployer quelquechose de très simple, nous n'avons pas l'intention de sortir la grosse artillerie habituelle (Serveur WMS, Mapserver, QGIS MapServer, ...), nous allons plutôt utiliser un fichier GeoJSON, en longitudes/latitudes WGS84 (EPSG:4326).&lt;/p&gt;
+&lt;p&gt;Pour cela, la bibliothèque &lt;a class="reference external" href="http://www.gdal.org"&gt;GDAL&lt;/a&gt; nous offre tous les outils adéquates:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Ouvrir le fichier shape (ESRI Shapefile) fourni par ParisData&lt;/li&gt;
+&lt;li&gt;Reprojetter en EPSG:4326&lt;/li&gt;
+&lt;li&gt;Choisir les données (attributaires) que nous allons conserver&lt;/li&gt;
+&lt;li&gt;Exporter en GeoJSON&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Pour notre exemple, nous avons choisi les emplacements des &lt;a class="reference external" href="http://opendata.paris.fr/opendata/jsp/site/Portal.jsp?document_id=57&amp;amp;portlet_id=106"&gt;points de collecte de verre&lt;/a&gt;.
+Parmis les champs fournis, nous choisissons de ne conserver que leur état (&lt;tt class="docutils literal"&gt;Lb_Etat_E&lt;/tt&gt;) et le nom de leur emplacement (&lt;tt class="docutils literal"&gt;Emplacemnt&lt;/tt&gt;).&lt;/p&gt;
+&lt;p&gt;Comme python est notre language préféré, et que c'est toujours un plaisir de le montrer en action, voici la petite procédure qui fait tout ça :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;# python gdal&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;osgeo&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;ogr&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;osgeo&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;osr&lt;/span&gt;
+&lt;span class="o"&gt;...&lt;/span&gt;
+&lt;span class="o"&gt;...&lt;/span&gt;
+&lt;span class="c"&gt;# Ouvrir le répertoire contenant les shape&lt;/span&gt;
+&lt;span class="n"&gt;source&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;ogr&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Open&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;INPUT_FOLDER&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="c"&gt;# La projection de sortie&lt;/span&gt;
+&lt;span class="n"&gt;spatialRef&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;osr&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;SpatialReference&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;span class="n"&gt;spatialRef&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;ImportFromEPSG&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;4326&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="c"&gt;# Le fichier de sortie&lt;/span&gt;
+&lt;span class="n"&gt;driver&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;ogr&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;GetDriverByName&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;GeoJSON&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;shape&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;driver&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;CreateDataSource&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;OUTPUT_FILE&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="c"&gt;# Parcourir les couches&lt;/span&gt;
+&lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;layer&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;source&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+    &lt;span class="c"&gt;# Reprojection originale -&amp;gt; destination&lt;/span&gt;
+    &lt;span class="n"&gt;originalSpatialRef&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;layer&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;GetSpatialRef&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+    &lt;span class="n"&gt;coordTransform&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;osr&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;CoordinateTransformation&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;originalSpatialRef&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+                                                  &lt;span class="n"&gt;spatialRef&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="c"&gt;# Choix des champs des données&lt;/span&gt;
+    &lt;span class="n"&gt;properties&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;ogr&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;FeatureDefn&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+    &lt;span class="n"&gt;properties&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;AddFieldDefn&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ogr&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;FieldDefn&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;Etat&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+    &lt;span class="n"&gt;properties&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;AddFieldDefn&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ogr&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;FieldDefn&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;Emplacement&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+
+    &lt;span class="c"&gt;# Créer la nouvelle couche GeoJSON&lt;/span&gt;
+    &lt;span class="n"&gt;newLayer&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;shape&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;CreateLayer&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;layer&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;GetName&lt;/span&gt;&lt;span class="p"&gt;(),&lt;/span&gt; &lt;span class="n"&gt;spatialRef&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+    &lt;span class="c"&gt;# Parcourir les features&lt;/span&gt;
+    &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;feature&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;layer&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+        &lt;span class="c"&gt;# Créer la nouvelle feature&lt;/span&gt;
+        &lt;span class="n"&gt;newFeature&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;ogr&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Feature&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;properties&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="c"&gt;# Remplir les champs choisis&lt;/span&gt;
+        &lt;span class="n"&gt;newFeature&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;SetField&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;Etat&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;feature&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;GetField&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;Lb_Etat_E&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+        &lt;span class="n"&gt;newFeature&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;SetField&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;Emplacement&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;feature&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;GetField&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;Emplacemnt&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+        &lt;span class="c"&gt;# Reprojetter la feature&lt;/span&gt;
+        &lt;span class="n"&gt;geometry&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;feature&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;GetGeometryRef&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+        &lt;span class="n"&gt;geometry&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Transform&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;coordTransform&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="c"&gt;# Sauvegarder&lt;/span&gt;
+        &lt;span class="n"&gt;newFeature&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;SetGeometry&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;geometry&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="n"&gt;newLayer&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;CreateFeature&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;newFeature&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="n"&gt;newFeature&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Destroy&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Nous obtenons en sortie un fichier GeoJSON avec les points en lat / long et les données 'Etat' et 'Emplacement'.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="p"&gt;...&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;type&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Feature&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;properties&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Etat&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Actif&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Emplacement&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;37 CHATEAU D&amp;#39;EAU ANGLE BOUCHARDON&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;},&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;geometry&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;type&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Point&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;coordinates&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt; &lt;span class="mf"&gt;2.358920&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mf"&gt;48.871154&lt;/span&gt; &lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="p"&gt;},&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;type&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Feature&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;properties&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Etat&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Actif&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Emplacement&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;13 place de la Nation&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;},&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;geometry&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;type&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Point&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;coordinates&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt; &lt;span class="mf"&gt;2.398154&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mf"&gt;48.848723&lt;/span&gt; &lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="p"&gt;},&lt;/span&gt;
+&lt;span class="p"&gt;...&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Le fichier pèse 174Ko, mais lorsqu'Apache le servira il pèsera 20Ko (grâce à la compression gzip !)&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="affichage"&gt;
+&lt;h2&gt;Affichage&lt;/h2&gt;
+&lt;p&gt;Nous choisissons d'afficher ces données dans une page avec &lt;a class="reference external" href="http://polymaps.org"&gt;polymaps&lt;/a&gt;. Il s'agit
+d'un composant Javascript permettant de créer des cartes interactives.&lt;/p&gt;
+&lt;p&gt;Les critères de comparaison avec OpenLayers (OL) sont:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;la légèreté (~30Ko, 10Ko en gzip!)&lt;/li&gt;
+&lt;li&gt;la rapiditité d'exécution&lt;/li&gt;
+&lt;li&gt;l'utilisation de GeoJSON et SVG (flexibilité et styles)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Cependant, la couverture fonctionnelle n'est absolument pas comparable. Mais pour afficher une carte avec des points, c'est largement suffisant !&lt;/p&gt;
+&lt;p&gt;On commence par un fond de carte: &lt;a class="reference external" href="http://cloudmade.com/"&gt;Cloudmade&lt;/a&gt;, dont les tuiles sont dessinées à partir d'&lt;a class="reference external" href="http://www.openstreetmap.org/"&gt;OpenStreetMap&lt;/a&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nx"&gt;map&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;add&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;po&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;image&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+        &lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;url&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;po&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;url&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;http://{S}tile.cloudmade.com&amp;quot;&lt;/span&gt;
+                  &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;/1a1b06b230af4efdbb989ea99e9841af&amp;quot;&lt;/span&gt;
+                  &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;/998/256/{Z}/{X}/{Y}.png&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;hosts&lt;/span&gt;&lt;span class="p"&gt;([&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;a.&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;b.&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;c.&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;])));&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;On ajoute ensuite nos données GeoJSON:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nx"&gt;map&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;add&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;po&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;geoJson&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+        &lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;url&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;collecteurs.json&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Polymaps facilite la personnalisation du dessin en fonction des données. Ici, nous affichons en vert les collecteurs à l'état &amp;quot;Actif&amp;quot; et en rouge les autres.
+De même nous mettons leur &amp;quot;Emplacement&amp;quot; en tooltip (&lt;tt class="docutils literal"&gt;svg:title&lt;/tt&gt;, Firefox 4, Chrome, Opera 11).&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nx"&gt;map&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;add&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;po&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;geoJson&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+        &lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;url&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;collecteurs.json&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;on&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;load&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;po&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;stylist&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+                      &lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;attr&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;fill&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+                            &lt;span class="kd"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;d&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+                                 &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nx"&gt;d&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;properties&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Etat&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;Actif&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;?&lt;/span&gt;
+                                        &lt;span class="s1"&gt;&amp;#39;green&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;red&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+                            &lt;span class="p"&gt;}))&lt;/span&gt;
+                      &lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;title&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kd"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;d&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+                                 &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nx"&gt;d&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;properties&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Emplacement&lt;/span&gt;
+                            &lt;span class="p"&gt;}));&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;img alt="" src="/images/parisdata-polymaps.jpg" /&gt;
+&lt;p&gt;&lt;a class="reference external" href="http://www.makina-corpus.org/demos/mle/parisdata-polymaps/"&gt;Accéder à la page de démonstration&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="conclusion"&gt;
+&lt;h2&gt;Conclusion&lt;/h2&gt;
+&lt;p&gt;Finalement, l'étape la plus compliquée était de reprojetter les données.
+On regrettera donc que l'initiative ParisData les ait publié sous cette forme exotique.&lt;/p&gt;
+&lt;p&gt;Comme le soulignait &lt;a class="reference external" href="http://www.biologeek.com/2010/12/ce-nest-pas-la-taille-qui-compte/"&gt;David&lt;/a&gt; : &lt;em&gt;Publieurs de données, concentrez vous sur la qualité, pas la taille, les développeurs vous remercieront !&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;À noter également que nous avons choisi une approche privilégiant la légèreté. Or, plusieurs sources de données de ParisData sont volumineuses et ne pourraient pas être affichées en GeoJSON sans mettre à genoux le navigateur. Nous serions alors contraints de servir les données sous forme de tuiles...&lt;/p&gt;
+&lt;/div&gt;
+</summary><category term="python"></category><category term="polymaps"></category><category term="gis"></category></entry></feed>

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>Announcing Subtivals, realtime subtitles for film festivals</title>
+        <meta charset="utf-8" />
+        <link rel="stylesheet" href="http://blog.mathieu-leplatre.info/theme/css/main.css" type="text/css" />
+        <link href="http://blog.mathieu-leplatre.info/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Mathieu Leplatre Atom Feed" />
+
+        <!--[if IE]>
+                <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+        <!--[if lte IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="http://blog.mathieu-leplatre.info/css/ie.css"/>
+                <script src="http://blog.mathieu-leplatre.info/js/IE8.js" type="text/javascript"></script><![endif]-->
+
+        <!--[if lt IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="http://blog.mathieu-leplatre.info/css/ie6.css"/><![endif]-->
+
+</head>
+
+<body id="index" class="home">
+<a href="https://github.com/leplatrem">
+<img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork me on GitHub" />
+</a>
+        <header id="banner" class="body">
+                <h1><a href="http://blog.mathieu-leplatre.info/">Mathieu Leplatre </a></h1>
+                <nav><ul>
+                    <li><a href="http://blog.mathieu-leplatre.info/pages/about.html">About</a></li>
+                    <li class="active"><a href="http://blog.mathieu-leplatre.info/category/dev.html">Dev</a></li>
+                    <li ><a href="http://blog.mathieu-leplatre.info/category/personal.html">Personal</a></li>
+                    <li ><a href="http://blog.mathieu-leplatre.info/category/sys.html">Sys</a></li>
+                    <li ><a href="http://blog.mathieu-leplatre.info/category/ux.html">Ux</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="http://blog.mathieu-leplatre.info/announcing-subtivals-realtime-subtitles-for-film-festivals.html" rel="bookmark"
+           title="Permalink to Announcing Subtivals, realtime subtitles for film festivals">Announcing Subtivals, realtime subtitles for film festivals</a></h1>
+<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="leplatrem">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2012-03-17T00:00:00+01:00">
+                Sat 17 March 2012
+        </abbr>
+
+        <address class="vcard author">
+                By <a class="url fn" href="http://blog.mathieu-leplatre.info/author/mathieu-leplatre.html">Mathieu Leplatre</a>
+        </address>
+<p>In <a href="http://blog.mathieu-leplatre.info/category/dev.html">Dev</a>. </p>
+<p>tags: <a href="http://blog.mathieu-leplatre.info/tag/subtivals.html">subtivals</a><a href="http://blog.mathieu-leplatre.info/tag/subtitles.html">subtitles</a><a href="http://blog.mathieu-leplatre.info/tag/accessibility.html">accessibility</a><a href="http://blog.mathieu-leplatre.info/tag/qt.html">qt</a><a href="http://blog.mathieu-leplatre.info/tag/c.html">c++</a></p>
+</footer><!-- /.post-info -->      <img alt="" src="/images/subtivals-logo.png" />
+<div class="section" id="that-s-how-it-started">
+<h2>That's how it started...</h2>
+<p>Subtitles and captions for the deaf and hard-of-hearing during film festivals
+are rarely a priority, at least in France. Thus, most film copies are not
+subtitled (except foreign movies shown in their original version).</p>
+<p>At the beginning of last year, <a class="reference external" href="http://st2l.fr">my friend Lilian</a> was promoting his project
+of improving and facilitating the projection of subtitles during film festivals.
+His activity consists in superimposing subtitles or projecting them on a
+separate display below the screen.</p>
+<img alt="" class="align-center" src="/images/subtivals-superimposed.png" />
+<p>In this way, subtitling dissociates from the movie reel, unlike DVDs for example.
+An operator is thence in charge of keeping captions synchroneous. It is sometimes called
+&quot;<em>virtual subtitling</em>&quot;; it is cheaper and easier than subtitled hard copies.</p>
+<p>Since there was no suitable Open Source tools to fulfill these precise needs,
+<a class="reference external" href="http://gedial.com">Arnaud</a> and I gave him a hand. We developed <a class="reference external" href="https://github.com/traxtech/subtivals">Subtivals</a>,
+a Free Software with simplicity and usuability for the technical operator in mind.</p>
+<img alt="" class="align-center" src="/images/subtivals-screenshot.png" />
+</div>
+<div class="section" id="main-features">
+<h2>Main features</h2>
+<p><em>Subtivals</em> has gained many features on the way, we released the <strong>version 1.0</strong> last month,
+after almost a year of development, driven by Lilian's experience.</p>
+<p>Among most notable features :</p>
+<ul class="simple">
+<li>Support of Advanced SubStation Alpha subtitles (ASS, *.ass) format</li>
+<li>Control Play / Pause / Delay / Speed</li>
+<li>Switch between several modes : timecode based, semi-automatic or fully manual</li>
+<li>Support for subtitles without timecodes (fixes duration automatically)</li>
+<li>SSA styles (italic, positions, colors)</li>
+<li>Customize and override styles (color and font size)</li>
+</ul>
+<p>In the small world of subtitles projection, where most tools are either
+very expensive, or very archaic, <em>Subtivals</em> is a revolution !</p>
+</div>
+<div class="section" id="hall-of-fame">
+<h2>Hall of fame</h2>
+<p><em>Subtivals</em> has proven its efficiency for several months now ! It was used
+successfully in many film festivals (<a class="reference external" href="http://www.festival-douarnenez.com">Festival de cinéma de Douarnenez</a>,
+<a class="reference external" href="http://festival-galactique.infini.fr">Festival Intergalactique de Brest</a>,
+<a class="reference external" href="http://www.festivaldebiarritz.com">Festival de Cinéma d'Amérique Latine de Biarritz</a>,
+<a class="reference external" href="http://www.filmfestamiens.org">Festival International du film d'Amiens</a>,
+<a class="reference external" href="http://www.lacinemathequedetoulouse.com/archives/2012/thematiques">Festival Zoom Arrière, 6e édition</a>,
+... and soon :
+<a class="reference external" href="http://www.cinelatino.com.fr">Cinélatino de Toulouse</a>,
+<a class="reference external" href="http://festival-resistances.fr">Résistances à Foix</a>)</p>
+<p>Its semi-manual mode also allows <a class="reference external" href="http://en.wikipedia.org/wiki/Surtitle">surtitling</a> at theaters (or opera, ballets, ...).</p>
+</div>
+<div class="section" id="installation">
+<h2>Installation</h2>
+<p><em>Subtivals</em> runs on GNU/Linux, Windows, Mac OS X and has no other external dependencies.</p>
+<p>On Ubuntu, install it easily using our PPA :</p>
+<pre class="literal-block">
+sudo add-apt-repository ppa:mathieu.leplatre/subtivals
+sudo apt-get update &amp;&amp; sudo apt-get install subtivals
+</pre>
+<p>Mac OS X and Windows installers are for sale, contact us !</p>
+</div>
+<div class="section" id="contribute">
+<h2>Contribute</h2>
+<p><em>Subtivals</em> is written in C++/Qt and released under the <a class="reference external" href="http://www.gnu.org/copyleft/gpl.html">GNU General Public License</a> .
+It is available in English, French, Spanish and Catalan.</p>
+<p>If you feel like contributing, testing, translating... <a class="reference external" href="https://github.com/traxtech/subtivals">join us on Github</a> !</p>
+</div>
+
+    </div><!-- /.entry-content -->
+    <div class="comments">
+      <h2>Comments !</h2>
+      <div id="disqus_thread"></div>
+      <script type="text/javascript">
+        var disqus_identifier = "announcing-subtivals-realtime-subtitles-for-film-festivals.html";
+        (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://mathieuleplatre.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+      </script>
+    </div>
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+                            <li><a href="http://blog.mathieu-leplatre.info/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="http://www.linkedin.com/in/leplatre">LinkedIn</a></li>
+                            <li><a href="https://code.launchpad.net/~mathieu.leplatre">Launchpad</a></li>
+                            <li><a href="https://github.com/leplatrem">GitHub</a></li>
+                            <li><a href="https://plus.google.com/u/0/106965745149150173373">Google+</a></li>
+                            <li><a href="http://twitter.com/leplatrem">Twitter</a></li>
+                            <li><a href="http://identi.ca/leplatrem">Identi.ca</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+        var pkBaseURL = (("https:" == document.location.protocol) ? "https://mathieu-leplatre.info/piwik/" : "http://mathieu-leplatre.info/piwik/");
+    document.write(unescape("%3Cscript src='" + pkBaseURL + "piwik.js' type='text/javascript'%3E%3C/script%3E"));
+    </script><script type="text/javascript">
+    try {
+    var piwikTracker = Piwik.getTracker(pkBaseURL + "piwik.php", 1);
+    piwikTracker.trackPageView();
+    piwikTracker.enableLinkTracking();
+    } catch( err ) {}
+    </script><noscript><p><img src="http://mathieu-leplatre.info/piwik/piwik.php?idsite=1" style="border:0" alt="" /></p></noscript>
+<script type="text/javascript">
+    var disqus_shortname = 'mathieuleplatre';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
+</body>
+</html>

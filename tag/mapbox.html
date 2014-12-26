@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>Mathieu Leplatre - mapbox</title>
+        <meta charset="utf-8" />
+        <link rel="stylesheet" href="http://blog.mathieu-leplatre.info/theme/css/main.css" type="text/css" />
+        <link href="http://blog.mathieu-leplatre.info/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Mathieu Leplatre Atom Feed" />
+
+        <!--[if IE]>
+                <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+        <!--[if lte IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="http://blog.mathieu-leplatre.info/css/ie.css"/>
+                <script src="http://blog.mathieu-leplatre.info/js/IE8.js" type="text/javascript"></script><![endif]-->
+
+        <!--[if lt IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="http://blog.mathieu-leplatre.info/css/ie6.css"/><![endif]-->
+
+</head>
+
+<body id="index" class="home">
+<a href="https://github.com/leplatrem">
+<img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork me on GitHub" />
+</a>
+        <header id="banner" class="body">
+                <h1><a href="http://blog.mathieu-leplatre.info/">Mathieu Leplatre </a></h1>
+                <nav><ul>
+                    <li><a href="http://blog.mathieu-leplatre.info/pages/about.html">About</a></li>
+                    <li ><a href="http://blog.mathieu-leplatre.info/category/dev.html">Dev</a></li>
+                    <li ><a href="http://blog.mathieu-leplatre.info/category/personal.html">Personal</a></li>
+                    <li ><a href="http://blog.mathieu-leplatre.info/category/sys.html">Sys</a></li>
+                    <li ><a href="http://blog.mathieu-leplatre.info/category/ux.html">Ux</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+        
+        
+
+            <aside id="featured" class="body">
+                <article>
+                    <h1 class="entry-title"><a href="http://blog.mathieu-leplatre.info/landez-introducing-new-features-of-our-tiles-toolbox.html">landez : introducing new features of our tiles toolbox</a></h1> 
+<footer class="post-info">
+        <abbr class="published" title="2012-02-24T12:45:00+01:00">
+                Fri 24 February 2012
+        </abbr>
+
+        <address class="vcard author">
+                By <a class="url fn" href="http://blog.mathieu-leplatre.info/author/mathieu-leplatre.html">Mathieu Leplatre</a>
+        </address>
+<p>In <a href="http://blog.mathieu-leplatre.info/category/dev.html">Dev</a>. </p>
+<p>tags: <a href="http://blog.mathieu-leplatre.info/tag/python.html">python</a><a href="http://blog.mathieu-leplatre.info/tag/mapbox.html">mapbox</a><a href="http://blog.mathieu-leplatre.info/tag/gis.html">gis</a><a href="http://blog.mathieu-leplatre.info/tag/landez.html">landez</a></p>
+</footer><!-- /.post-info --><p><a class="reference external" href="https://github.com/makinacorpus/landez">landez</a> started as a very small toolbox to build MBTiles files
+specifying bounding boxes and zoom levels. We have been using it for several GIS projects
+at <a class="reference external" href="http://www.makina-corpus.com">Makina Corpus</a>, and can tell it's reliable !</p>
+<p>Landez is pure python and follows the <a class="reference external" href="http://en.wikipedia.org/wiki/KISS_principle">KISS principle</a>.
+It has optional requirements on <a class="reference external" href="http://pypi.python.org/pypi/PIL">PIL</a> and <a class="reference external" href="http://pypi.python.org/pypi/mapnik2">mapnik</a>
+for compositing, tile arranging or rendering.</p>
+<p>Recently, we've added many extra cool features, which deserve highlight !</p>
+<div class="section" id="simple-wms-support">
+<h2>Simple WMS support</h2>
+<p>With landez, you can store your WMS layers into MBTiles files ! It will
+request the WMS /images and save them into tiles on disk ! You can then
+enjoy the power of MBTiles files : transport, speed, ...</p>
+<div class="highlight"><pre><span class="n">mb</span> <span class="o">=</span> <span class="n">MBTilesBuilder</span><span class="p">(</span><span class="n">wms_server</span><span class="o">=</span><span class="s">&quot;http://yourserver.com/geoserver/wms&quot;</span><span class="p">,</span>
+                    <span class="n">wms_layers</span><span class="o">=</span><span class="p">[</span><span class="s">&quot;ign:departements&quot;</span><span class="p">],</span>
+                    <span class="n">wms_options</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">format</span><span class="o">=</span><span class="s">&quot;image/png&quot;</span><span class="p">,</span>
+                                     <span class="n">transparent</span><span class="o">=</span><span class="bp">True</span><span class="p">),</span>
+                    <span class="n">filepath</span><span class="o">=</span><span class="s">&quot;dest.mbtiles&quot;</span><span class="p">)</span>
+<span class="n">mb</span><span class="o">.</span><span class="n">add_coverage</span><span class="p">(</span><span class="n">bbox</span><span class="o">=</span><span class="p">([</span><span class="o">-</span><span class="mf">0.9853</span><span class="p">,</span><span class="mf">43.6435</span><span class="o">.</span><span class="mi">1126</span><span class="p">,</span><span class="mf">44.0639</span><span class="p">]),</span>
+                <span class="n">zoomlevels</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">18</span><span class="p">))</span>
+<span class="n">mb</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="section" id="tiles-compositing">
+<h2>Tiles compositing</h2>
+<p>This is the killer feature ! With landez, you can now merge multiple sources
+of tiles (URL, WMS, MBTiles, Mapnik stylesheet) together !</p>
+<p>For example, build a new MBTiles file by blending tiles of another on top of OpenStreetMap tiles :</p>
+<div class="highlight"><pre><span class="n">mb</span> <span class="o">=</span> <span class="n">MBTilesBuilder</span><span class="p">(</span><span class="n">remote</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                    <span class="n">filepath</span><span class="o">=</span><span class="s">&quot;merged.mbtiles&quot;</span><span class="p">)</span>
+<span class="n">overlay</span> <span class="o">=</span> <span class="n">TilesManager</span><span class="p">(</span><span class="n">mbtiles_file</span><span class="o">=</span><span class="s">&quot;carto.mbtiles&quot;</span><span class="p">)</span>
+<span class="n">mb</span><span class="o">.</span><span class="n">add_layer</span><span class="p">(</span><span class="n">overlay</span><span class="p">)</span>
+<span class="n">mb</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+<p>Simply make a composite a WMS layer with OpenStreetMap using transparency ! You might find this useful
+for compositing satellite image with street maps :</p>
+<div class="highlight"><pre><span class="n">mb</span> <span class="o">=</span> <span class="n">MBTilesBuilder</span><span class="p">(</span><span class="n">wms_server</span><span class="o">=</span><span class="s">&quot;http://yourserver.com/geoserver/wms&quot;</span><span class="p">,</span>
+                    <span class="n">wms_layers</span><span class="o">=</span><span class="p">[</span><span class="s">&quot;img:orthophoto&quot;</span><span class="p">],</span>
+                    <span class="n">filepath</span><span class="o">=</span><span class="s">&quot;wms_osm.mbtiles&quot;</span><span class="p">)</span>
+<span class="n">overlay</span> <span class="o">=</span> <span class="n">TilesManager</span><span class="p">(</span><span class="n">remote</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">mb</span><span class="o">.</span><span class="n">add_layer</span><span class="p">(</span><span class="n">overlay</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">)</span>  <span class="c"># 40%</span>
+<span class="n">mb</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="section" id="arrange-tiles-into-single-images">
+<h2>Arrange tiles into single /images</h2>
+<p>This feature can be very useful for printing tiled maps or have a quick overview
+of your compositing results !</p>
+<p>Refer to any source of tiles, like you would do with <cite>MBTilesBuilder</cite>,
+add layers if you like and export the image !</p>
+<div class="highlight"><pre><span class="n">ie</span> <span class="o">=</span> <span class="n">ImageExporter</span><span class="p">(</span><span class="n">tiles_url</span><span class="o">=</span><span class="s">&#39;http://server/tile/{z}/{x}/{y}.png&#39;</span><span class="p">)</span>
+<span class="o">...</span>
+<span class="o">...</span>
+<span class="n">ie</span><span class="o">.</span><span class="n">export_image</span><span class="p">(</span><span class="n">bbox</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">180.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">90.0</span><span class="p">,</span> <span class="mf">180.0</span><span class="p">,</span> <span class="mf">90.0</span><span class="p">),</span>
+                <span class="n">zoomlevel</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                <span class="n">imagepath</span><span class="o">=</span><span class="s">&quot;image.png&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="mbtiles-content-reading">
+<h2>MBTiles content reading</h2>
+<p>landez can now read MBTiles content !</p>
+<p>We could proudly add it to the list of implementations for the <a class="reference external" href="https://github.com/mapbox/mbtiles-spec/wiki/Implementations">MBTiles spec</a>
+and <a class="reference external" href="https://github.com/mapbox/utfgrid-spec/wiki/Implementations">UTF-Grid spec</a> !</p>
+<p>Use MBTiles files like any tile source :</p>
+<div class="highlight"><pre><span class="n">mb</span> <span class="o">=</span> <span class="n">MBTilesBuilder</span><span class="p">(</span><span class="n">mbtiles_file</span><span class="o">=</span><span class="s">&quot;yourfile.mbtiles&quot;</span><span class="p">)</span>
+</pre></div>
+<p>...extract single image or UTF-Grid tiles :</p>
+<div class="highlight"><pre><span class="kn">from</span> <span class="nn">landez.reader</span> <span class="kn">import</span> <span class="n">MBTilesReader</span>
+
+<span class="n">mbreader</span> <span class="o">=</span> <span class="n">MBTilesReader</span><span class="p">(</span><span class="s">&quot;yourfile.mbtiles&quot;</span><span class="p">)</span>
+
+<span class="c"># Metadata</span>
+<span class="k">print</span> <span class="n">mbreader</span><span class="o">.</span><span class="n">metadata</span><span class="p">()</span>
+<span class="c"># Zoom levels</span>
+<span class="k">print</span> <span class="n">mbreader</span><span class="o">.</span><span class="n">zoomlevels</span><span class="p">()</span>
+<span class="c"># Image tile</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;tile.png&#39;</span><span class="p">,</span> <span class="s">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">out</span><span class="p">:</span>
+    <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">reader</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>
+<span class="c"># UTF-Grid tile</span>
+<span class="k">print</span> <span class="n">reader</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="s">&#39;callback&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="next-steps">
+<h2>Next steps...</h2>
+<p>The code has grown quickly and deserves a good refactoring, which is being done in a separate
+branch <a class="reference external" href="https://github.com/makinacorpus/landez">on GitHub</a> ! The goal is to
+keep the same simple API, better modularity, increase tests coverage...</p>
+<p>If you are wiling to participate, feel welcome !</p>
+</div>
+<p>There are <a href="http://blog.mathieu-leplatre.info/landez-introducing-new-features-of-our-tiles-toolbox.html#disqus_thread">comments</a>.</p>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+        
+
+ 
+            <li><article class="hentry">    
+                <header>
+                    <h1><a href="http://blog.mathieu-leplatre.info/landez-fabriquer-facilement-des-fichiers-mbtiles-en-python-fr.html" rel="bookmark"
+                           title="Permalink to landez : fabriquer facilement des fichiers MBTiles en python">landez : fabriquer facilement des fichiers MBTiles en python</a></h1>
+                </header>
+                
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2011-04-21T12:04:00+02:00">
+                Thu 21 April 2011
+        </abbr>
+
+        <address class="vcard author">
+                By <a class="url fn" href="http://blog.mathieu-leplatre.info/author/mathieu-leplatre.html">Mathieu Leplatre</a>
+        </address>
+<p>In <a href="http://blog.mathieu-leplatre.info/category/dev.html">Dev</a>. </p>
+<p>tags: <a href="http://blog.mathieu-leplatre.info/tag/python.html">python</a><a href="http://blog.mathieu-leplatre.info/tag/mapbox.html">mapbox</a><a href="http://blog.mathieu-leplatre.info/tag/gis.html">gis</a><a href="http://blog.mathieu-leplatre.info/tag/landez.html">landez</a></p>
+</footer><!-- /.post-info -->                <p><a class="reference external" href="http://www.makina-corpus.org/blog/integration-mbtiles-format-android">Une nouvelle fois</a>,
+Makina Corpus se rapproche du projet <a class="reference external" href="http://mapbox.com/">MapBox</a>, avec une contribution
+sur la librairie <a class="reference external" href="https://github.com/mapbox/mbutil/contributors">mbutil</a>, qui permet de fabriquer des fichiers MBTiles.</p>
+<p>Nous l'utilisons dans <a class="reference external" href="https://github.com/makinacorpus/landez">landez</a>, un outil qui permet
+de créer des fichiers MBTiles à partir de sites de tuiles externes ou de feuilles de styles ...</p>
+                <a class="readmore" href="http://blog.mathieu-leplatre.info/landez-fabriquer-facilement-des-fichiers-mbtiles-en-python-fr.html">read more</a>
+<p>There are <a href="http://blog.mathieu-leplatre.info/landez-fabriquer-facilement-des-fichiers-mbtiles-en-python-fr.html#disqus_thread">comments</a>.</p>                </div><!-- /.entry-content -->
+            </article></li>
+            </ol><!-- /#posts-list -->
+<p class="paginator">
+    Page 1 / 1
+</p>
+            </section><!-- /#content -->
+        <section id="extras" class="body">
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+                            <li><a href="http://blog.mathieu-leplatre.info/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="http://www.linkedin.com/in/leplatre">LinkedIn</a></li>
+                            <li><a href="https://code.launchpad.net/~mathieu.leplatre">Launchpad</a></li>
+                            <li><a href="https://github.com/leplatrem">GitHub</a></li>
+                            <li><a href="https://plus.google.com/u/0/106965745149150173373">Google+</a></li>
+                            <li><a href="http://twitter.com/leplatrem">Twitter</a></li>
+                            <li><a href="http://identi.ca/leplatrem">Identi.ca</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+        var pkBaseURL = (("https:" == document.location.protocol) ? "https://mathieu-leplatre.info/piwik/" : "http://mathieu-leplatre.info/piwik/");
+    document.write(unescape("%3Cscript src='" + pkBaseURL + "piwik.js' type='text/javascript'%3E%3C/script%3E"));
+    </script><script type="text/javascript">
+    try {
+    var piwikTracker = Piwik.getTracker(pkBaseURL + "piwik.php", 1);
+    piwikTracker.trackPageView();
+    piwikTracker.enableLinkTracking();
+    } catch( err ) {}
+    </script><noscript><p><img src="http://mathieu-leplatre.info/piwik/piwik.php?idsite=1" style="border:0" alt="" /></p></noscript>
+<script type="text/javascript">
+    var disqus_shortname = 'mathieuleplatre';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
+</body>
+</html>

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>Deploy Django projects using git push</title>
+        <meta charset="utf-8" />
+        <link rel="stylesheet" href="http://blog.mathieu-leplatre.info/theme/css/main.css" type="text/css" />
+        <link href="http://blog.mathieu-leplatre.info/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Mathieu Leplatre Atom Feed" />
+
+        <!--[if IE]>
+                <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+        <!--[if lte IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="http://blog.mathieu-leplatre.info/css/ie.css"/>
+                <script src="http://blog.mathieu-leplatre.info/js/IE8.js" type="text/javascript"></script><![endif]-->
+
+        <!--[if lt IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="http://blog.mathieu-leplatre.info/css/ie6.css"/><![endif]-->
+
+</head>
+
+<body id="index" class="home">
+<a href="https://github.com/leplatrem">
+<img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork me on GitHub" />
+</a>
+        <header id="banner" class="body">
+                <h1><a href="http://blog.mathieu-leplatre.info/">Mathieu Leplatre </a></h1>
+                <nav><ul>
+                    <li><a href="http://blog.mathieu-leplatre.info/pages/about.html">About</a></li>
+                    <li ><a href="http://blog.mathieu-leplatre.info/category/dev.html">Dev</a></li>
+                    <li ><a href="http://blog.mathieu-leplatre.info/category/personal.html">Personal</a></li>
+                    <li class="active"><a href="http://blog.mathieu-leplatre.info/category/sys.html">Sys</a></li>
+                    <li ><a href="http://blog.mathieu-leplatre.info/category/ux.html">Ux</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="http://blog.mathieu-leplatre.info/deploy-django-projects-using-git-push.html" rel="bookmark"
+           title="Permalink to Deploy Django projects using git push">Deploy Django projects using git push</a></h1>
+<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="leplatrem">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2013-08-12T22:00:00+02:00">
+                Mon 12 August 2013
+        </abbr>
+
+        <address class="vcard author">
+                By <a class="url fn" href="http://blog.mathieu-leplatre.info/author/mathieu-leplatre.html">Mathieu Leplatre</a>
+        </address>
+<p>In <a href="http://blog.mathieu-leplatre.info/category/sys.html">Sys</a>. </p>
+<p>tags: <a href="http://blog.mathieu-leplatre.info/tag/django.html">django</a><a href="http://blog.mathieu-leplatre.info/tag/git.html">git</a></p>
+</footer><!-- /.post-info -->      <p>Deploying stuff in one command is becoming the Holy Grail of development,
+with currently ten times more blog articles than Medieval crusades :)</p>
+<p>I could not miss the opportunity to write mine !</p>
+<p><strong>Disclaimer:</strong> In order to keep this article as clear (and short) as possible,
+the first step setup on a blank server does not use any provisionning system
+(<em>another religious matter</em>).</p>
+<div class="section" id="prerequesites-easy-dependencies">
+<h2>Prerequesites : easy dependencies</h2>
+<p>Having a simple <tt class="docutils literal">Makefile</tt> for your application is highly recommended, it will gather all repetitive
+commands for setting up dependencies.</p>
+<p>Here is a minimalist (working) example, with a project called <tt class="docutils literal">revolution</tt></p>
+<pre class="literal-block">
+install: bin/python
+
+bin/python:
+    virtualenv .
+    bin/python setup.py develop
+
+serve: bin/python
+    bin/python ./manage.py runserver 8888
+
+deploy: bin/python
+    bin/python ./manage.py collectstatic --clear --noinput
+    touch revolution/wsgi.py  # trigger reload
+
+clean:
+    rm -rf bin/ lib/ build/ dist/ *.egg-info/ include/ local/
+</pre>
+<p>If your project does have any <tt class="docutils literal">setup.py</tt>, just write one <a class="footnote-reference" href="#id3" id="id1">[1]</a> or use a <tt class="docutils literal">requirements.txt</tt> file <a class="footnote-reference" href="#id4" id="id2">[2]</a>
+and replace <tt class="docutils literal">bin/python setup.py develop</tt> in <em>Makefile</em> with <tt class="docutils literal">bin/pip install <span class="pre">-r</span> requirements.txt</tt>.</p>
+<p>Now you can then run your deployment commands with <tt class="docutils literal">make deploy</tt>.</p>
+</div>
+<div class="section" id="first-step-server-setup">
+<h2>First step : server setup</h2>
+<div class="section" id="prepare-repository">
+<h3>Prepare repository</h3>
+<p>On your server, create two folders : the repository and deployed app.</p>
+<div class="highlight"><pre>mkdir -p /var/git/yourapp.git
+mkdir -p /var/www/yourapp
+</pre></div>
+<p>The Git repository will serve as a remote for our code.</p>
+<div class="highlight"><pre><span class="nb">cd</span> /var/git/yourapp.git
+git init --bare .
+</pre></div>
+<p>Using Git hooks, we will deploy the code being pushed into the
+deployed app folder. Create the file <em>hooks/post-receive</em>
+with the following content</p>
+<pre class="literal-block">
+#!/bin/sh
+dest=/var/www/yourapp
+echo &quot;Deploying into $dest&quot;
+GIT_WORK_TREE=$dest git checkout --force
+cd $dest
+make deploy
+</pre>
+<p>And make it executable</p>
+<pre class="literal-block">
+chmod +x /var/git/yourapp.git/hooks/post-receive
+</pre>
+</div>
+<div class="section" id="setup-web-server">
+<h3>Setup Web server</h3>
+<p>Again, in order to make this straight to the point, I will use <em>Apache's mod_wsgi</em>,
+since the configuration is trivial.</p>
+<p>Of course, <em>nginx</em>, <em>gunicorn</em>, <em>uwsgi</em> or <em>circus</em> still belong to our prefered stacks but
+currently our main point is <em>deploying with git push</em> !</p>
+<pre class="literal-block">
+sudo apt-get install libapache2-mod-wsgi
+</pre>
+<p>Create a very simple Apache configuration file in <em>/etc/apache2/sites-available/001-yourapp</em></p>
+<pre class="literal-block">
+WSGIPythonPath /var/www/yourapp:/var/www/yourapp/lib/python2.6/site-packages
+
+&lt;VirtualHost *:80&gt;
+    ServerName yourapp.com
+    ServerAdmin contact&#64;yourapp.com
+
+    Alias /static/ /var/www/yourapp/public/static/
+    &lt;Directory /var/www/yourapp/public/static&gt;
+        Order deny,allow
+        Allow from all
+    &lt;/Directory&gt;
+
+    WSGIScriptAlias / /var/www/yourapp/revolution/wsgi.py
+    &lt;Directory /var/www/yourapp/revolution/&gt;
+        &lt;Files wsgi.py&gt;
+            Order deny,allow
+            Allow from all
+        &lt;/Files&gt;
+    &lt;/Directory&gt;
+&lt;/VirtualHost&gt;
+</pre>
+<p>And enable it</p>
+<pre class="literal-block">
+sudo a2ensite 001-yourapp
+sudo /etc/init.d/apache2 restart
+</pre>
+<p>Your site is now up and running...</p>
+</div>
+</div>
+<div class="section" id="next-steps-push-updates">
+<h2>Next steps : push updates !</h2>
+<p>Now that the application is in production, you will obviously want to push updates !</p>
+<p>Comfortably installed at your desk, you just have to push commits to the server,
+the same way you already do for your code !</p>
+<p>Add the remote (once)</p>
+<pre class="literal-block">
+$ git remote add production ssh://user&#64;server:/var/git/yourapp.git
+</pre>
+<p>And push !</p>
+<pre class="literal-block">
+$ git push production master
+
+...
+Counting objects: 862, done.
+Delta compression using up to 4 threads.
+Compressing objects: 100% (437/437), done.
+Writing objects: 100% (817/817), 121.16 KiB, done.
+Total 817 (delta 608), reused 452 (delta 332)
+remote: Deploying into /var/www/yourapp
+...
+remote: bin/python setup.py develop
+...
+...
+remote: 345 static files copied.
+To server:/var/git/yourapp.git
+   2fe81f4..76a3fb8  master -&gt; master
+</pre>
+<p>Your site is up-to-date ! Depending of course of caching policies, but it runs the last version.</p>
+<p>Obviously, it is very likely that you will want to push specific branches, but that, you already know!</p>
+<img alt="" src="/images/cat_pope.jpg" />
+<table class="docutils footnote" frame="void" id="id3" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td><a class="reference external" href="https://docs.djangoproject.com/en/dev/intro/reusable-apps/#packaging-your-app">https://docs.djangoproject.com/en/dev/intro/reusable-apps/#packaging-your-app</a></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id4" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id2">[2]</a></td><td><a class="reference external" href="http://www.pip-installer.org/en/latest/requirements.html">http://www.pip-installer.org/en/latest/requirements.html</a></td></tr>
+</tbody>
+</table>
+</div>
+
+    </div><!-- /.entry-content -->
+    <div class="comments">
+      <h2>Comments !</h2>
+      <div id="disqus_thread"></div>
+      <script type="text/javascript">
+        var disqus_identifier = "deploy-django-projects-using-git-push.html";
+        (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://mathieuleplatre.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+      </script>
+    </div>
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+                            <li><a href="http://blog.mathieu-leplatre.info/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="http://www.linkedin.com/in/leplatre">LinkedIn</a></li>
+                            <li><a href="https://code.launchpad.net/~mathieu.leplatre">Launchpad</a></li>
+                            <li><a href="https://github.com/leplatrem">GitHub</a></li>
+                            <li><a href="https://plus.google.com/u/0/106965745149150173373">Google+</a></li>
+                            <li><a href="http://twitter.com/leplatrem">Twitter</a></li>
+                            <li><a href="http://identi.ca/leplatrem">Identi.ca</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+    <script type="text/javascript">
+        var pkBaseURL = (("https:" == document.location.protocol) ? "https://mathieu-leplatre.info/piwik/" : "http://mathieu-leplatre.info/piwik/");
+    document.write(unescape("%3Cscript src='" + pkBaseURL + "piwik.js' type='text/javascript'%3E%3C/script%3E"));
+    </script><script type="text/javascript">
+    try {
+    var piwikTracker = Piwik.getTracker(pkBaseURL + "piwik.php", 1);
+    piwikTracker.trackPageView();
+    piwikTracker.enableLinkTracking();
+    } catch( err ) {}
+    </script><noscript><p><img src="http://mathieu-leplatre.info/piwik/piwik.php?idsite=1" style="border:0" alt="" /></p></noscript>
+<script type="text/javascript">
+    var disqus_shortname = 'mathieuleplatre';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
+</body>
+</html>
